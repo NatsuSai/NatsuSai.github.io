@@ -138,7 +138,7 @@ social_icons:
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-#avatar:
+#avatar: /upoads/18627047.jpg
 
 
 # Table Of Contents in the Sidebar
@@ -275,7 +275,7 @@ duoshuo_info:
   ua_enable: true
   admin_enable: true
   user_id: 6391040468200719000
-  admin_nickname: 卡密sama
+  admin_nickname: 主编大大
 
 
 # Facebook SDK Support.

@@ -34,7 +34,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -74,7 +74,7 @@ deploy:
   branch: master
 
 # Avatar Ico
-avatar: /uploads/18627047.jpg
+avatar: https://avatars0.githubusercontent.com/u/18627047?v=3&s=460
 
 # Search
 search:
@@ -84,7 +84,10 @@ search:
   limit: 10000
 
 # Duoshuo
-disqus_shortname: NatsuSaiGithub
+duoshuo_shortname: NatsuSaiGithub
+
+# Disqus
+disqus_shortname: natsusai-github
 
 # Baidu Analytics
 baidu_analytics: 25e5b3f24bc7ddff2521cee9ff5d4e6a
