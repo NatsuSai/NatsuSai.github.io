@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="02b1ee86-479f-428f-9b2b-98c0f8c04a4c" name="Default" comment="">
+    <list default="true" id="02b1ee86-479f-428f-9b2b-98c0f8c04a4c" name="Default" comment="2017-3-20:修改文章">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/source/_posts/とある三秋 缒的一些摘抄.md" afterPath="$PROJECT_DIR$/source/_posts/とある三秋 缒的一些摘抄.md" />
     </list>
@@ -45,8 +45,8 @@
         <entry file="file://$PROJECT_DIR$/source/_posts/とある三秋 缒的一些摘抄.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="76">
-                <caret line="4" column="4" lean-forward="true" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+              <first_editor relative-caret-position="19">
+                <caret line="1" column="14" lean-forward="false" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -122,10 +122,10 @@
             <state relative-caret-position="380">
               <caret line="20" column="64" lean-forward="false" selection-start-line="20" selection-start-column="64" selection-end-line="20" selection-end-column="64" />
               <folding>
-                <marker date="1489983518286" expanded="true" signature="66410:66429" ph="..." />
-                <marker date="1489983518286" expanded="true" signature="66410:66447" ph="..." />
-                <marker date="1489983518286" expanded="true" signature="66410:66460" ph="..." />
-                <marker date="1489983518286" expanded="true" signature="66410:66475" ph="..." />
+                <marker date="1489986017353" expanded="true" signature="66728:66747" ph="..." />
+                <marker date="1489986017353" expanded="true" signature="66728:66765" ph="..." />
+                <marker date="1489986017353" expanded="true" signature="66728:66778" ph="..." />
+                <marker date="1489986017353" expanded="true" signature="66728:66793" ph="..." />
               </folding>
             </state>
           </provider>
@@ -717,7 +717,7 @@
       <workItem from="1488868764835" duration="161000" />
       <workItem from="1489381606531" duration="51000" />
       <workItem from="1489732311959" duration="1409000" />
-      <workItem from="1489978140374" duration="3943000" />
+      <workItem from="1489978140374" duration="5094000" />
     </task>
     <task id="LOCAL-00001" summary="Update:添加新窗口打开链接">
       <created>1488530118641</created>
@@ -754,11 +754,18 @@
       <option name="project" value="LOCAL" />
       <updated>1489980345517</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="2017-3-20:修改文章">
+      <created>1489984952613</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1489984952613</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15738000" />
+    <option name="totallyTimeSpent" value="16889000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1179,10 +1186,10 @@
         <state relative-caret-position="380">
           <caret line="20" column="64" lean-forward="false" selection-start-line="20" selection-start-column="64" selection-end-line="20" selection-end-column="64" />
           <folding>
-            <marker date="1489983518286" expanded="true" signature="66410:66429" ph="..." />
-            <marker date="1489983518286" expanded="true" signature="66410:66447" ph="..." />
-            <marker date="1489983518286" expanded="true" signature="66410:66460" ph="..." />
-            <marker date="1489983518286" expanded="true" signature="66410:66475" ph="..." />
+            <marker date="1489986017353" expanded="true" signature="66728:66747" ph="..." />
+            <marker date="1489986017353" expanded="true" signature="66728:66765" ph="..." />
+            <marker date="1489986017353" expanded="true" signature="66728:66778" ph="..." />
+            <marker date="1489986017353" expanded="true" signature="66728:66793" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1253,8 +1260,8 @@
     <entry file="file://$PROJECT_DIR$/source/_posts/とある三秋 缒的一些摘抄.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="76">
-            <caret line="4" column="4" lean-forward="true" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+          <first_editor relative-caret-position="19">
+            <caret line="1" column="14" lean-forward="false" selection-start-line="1" selection-start-column="14" selection-end-line="1" selection-end-column="14" />
             <folding />
           </first_editor>
           <second_editor />
