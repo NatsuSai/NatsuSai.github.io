@@ -1,5 +1,6 @@
 ---
 title: Nginx基础——Rewrite规则
+date: 2018/12/30 15:13:00
 categories: 
 - Nginx
 tags: 
