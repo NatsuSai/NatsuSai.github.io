@@ -7,7 +7,7 @@ title: NatsuSai's World
 subtitle: 这里是NatsuSai的世界
 description: 君を見てると、心が震える
 author: Kurenai
-language: zh-Hans
+language: zh-CN
 timezone:
 
 # URL
@@ -64,7 +64,7 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # theme: landscape
-theme: next
+theme: next-reloaded
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -91,3 +91,11 @@ disqus_shortname: natsusai-github
 
 # Baidu Analytics
 baidu_analytics: 25e5b3f24bc7ddff2521cee9ff5d4e6a
+
+theme_config:
+  avatar:
+    url: /images/18627047.jpg #/images/avatar.gif
+    rounded: true
+  sidebar:
+    display: always
+  scheme: Mist
