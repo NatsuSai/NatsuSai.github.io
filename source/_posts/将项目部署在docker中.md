@@ -41,6 +41,8 @@ CMD ["/bin/bash"]
 #启动时执行的命令
 ENTRYPOINT ["java","-jar","-Xms2048m", "-Xmx2048m", "-XX:PermSize=256M", "-XX:MaxPermSize=256M","/usr/local/supervise-svc-0.0.1-SNAPSHOT.jar"]
 ```
+
+<!--more-->
 ```
 #前端react项目
 
