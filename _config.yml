@@ -94,7 +94,7 @@ baidu_analytics: 25e5b3f24bc7ddff2521cee9ff5d4e6a
 
 theme_config:
   cache:
-    false
+    true
   avatar:
     url: /images/18627047.jpg #/images/avatar.gif
     rounded: true
