@@ -10,6 +10,9 @@ tags:
 comments: true 
 thumbnail: /gallery/test.jpg
 ---
+test test！！
+
+<!--more-->
 ## ACG
 
 ### 格子裙赛高！

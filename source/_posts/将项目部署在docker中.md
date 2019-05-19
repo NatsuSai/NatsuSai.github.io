@@ -9,15 +9,14 @@ tags:
 comments: true
 thumbnail: /gallery/test.jpg
 ---
-Banner: {% link カントク - COLORS http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872 カントク - COLORS %}
-## docker
 docker中有两个概念，容器与镜像。 
 
 镜像我们可以简单的理解为是装机用的光盘，而容器就是我们用光盘所装的一个系统。实际上我们就是由镜像生成一个容器，一个镜像可以生成多个容器（只要容器互不相冲突）。
 
 而镜像的生成就是由配置文件来决定（配置文件参数可由后期运行指令等等操作更改），具体如何配置不详细说明。
-
 <!--more-->
+> Banner: {% link カントク - COLORS http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872 カントク - COLORS %}
+
 配置文件例子  
 Dockerfile
 ``` dockerfile

@@ -11,6 +11,7 @@ thumbnail: /gallery/test.jpg
 ---
 &emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。
 
+<!--more-->
 ## 正则匹配规则
 {% blockquote %}
 ~  区分大小写匹配  
@@ -27,7 +28,6 @@ thumbnail: /gallery/test.jpg
 -x和!-x 判断文件是否可执行
 {% endblockquote %}
 
-<!--more-->
 ## rewrite基本语法
 
 {% codeblock %}
