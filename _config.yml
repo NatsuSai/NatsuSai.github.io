@@ -3,8 +3,8 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: NatsuSai's World
-subtitle: 这里是NatsuSai的世界
+title: Kurenai's World
+subtitle: 这里是Kurenai的世界
 description: 君を見てると、心が震える
 author: Kurenai
 language: zh-CN
@@ -64,7 +64,7 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # theme: landscape
-theme: next
+theme: icarus
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -91,62 +91,3 @@ disqus_shortname: natsusai-github
 
 # Baidu Analytics
 baidu_analytics: 25e5b3f24bc7ddff2521cee9ff5d4e6a
-
-theme_config:
-  cache:
-    true
-  avatar:
-    url: /images/18627047.jpg #/images/avatar.gif
-    rounded: true
-  sidebar:
-    display: always
-  scheme: Mist
-  github_banner:
-    enable: false
-    permalink: https://github.com/NatsuSai
-    title: Follow me on GitHub
-  pace: true
-  # Themes list:
-  # pace-theme-big-counter | pace-theme-bounce | pace-theme-barber-shop | pace-theme-center-atom
-  # pace-theme-center-circle | pace-theme-center-radar | pace-theme-center-simple | pace-theme-corner-indicator
-  # pace-theme-fill-left | pace-theme-flash | pace-theme-loading-bar | pace-theme-mac-osx | pace-theme-minimal
-  pace_theme: pace-theme-loading-bar
-  tagcloud:
-    # If true, font size, font color and amount of tags can be customized
-    enable: true
-
-    # All values below are same as default, change them by yourself
-    min: 12 # min font size in px
-    max: 30 # max font size in px
-    start: "#ccc" # start color (hex, rgba, hsla or color keywords)
-    end: "#111" # end color (hex, rgba, hsla or color keywords)
-    amount: 200 # amount of tags, chage it if you have more than 200 tags
-  # Social Links
-  # Usage: `Key: permalink || icon`
-  # Key is the link label showing to end users.
-  # Value before `||` delimeter is the target permalink.
-  # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, globe icon will be loaded.
-  social:
-    GitHub: https://github.com/NatsuSai || github
-    #E-Mail: mailto:yourname@gmail.com || envelope
-    #Weibo: https://weibo.com/yourname || weibo
-    #Google: https://plus.google.com/yourname || google
-    #Twitter: https://twitter.com/yourname || twitter
-    #FB Page: https://www.facebook.com/yourname || facebook
-    #VK Group: https://vk.com/yourname || vk
-    #StackOverflow: https://stackoverflow.com/yourname || stack-overflow
-    #YouTube: https://youtube.com/yourname || youtube
-    #Instagram: https://instagram.com/yourname || instagram
-    #Skype: skype:yourname?call|chat || skype
-  back2top:
-    enable: true
-    # Back to top in sidebar.
-    sidebar: false
-    # Scroll percent label in b2t button.
-    scrollpercent: true
-
-#  creative_commons:
-#    license: by-nc-sa
-#    sidebar: true
-#    post: true
-#    language: deed.zh

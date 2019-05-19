@@ -2,13 +2,14 @@
 title: 将项目部署在docker中
 date: 2019/3/14 11:39
 categories: 
-- docker
+    - docker
 tags: 
-- docker
-- ops
+    - docker
+    - ops
 comments: true
+thumbnail: /gallery/test.jpg
 ---
-# 将项目部署在docker中 #
+Banner: {% link カントク - COLORS http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872 カントク - COLORS %}
 ## docker
 docker中有两个概念，容器与镜像。 
 
@@ -16,9 +17,10 @@ docker中有两个概念，容器与镜像。
 
 而镜像的生成就是由配置文件来决定（配置文件参数可由后期运行指令等等操作更改），具体如何配置不详细说明。
 
+<!--more-->
 配置文件例子  
 Dockerfile
-```
+``` dockerfile
 #后端java项目
 
 #基础镜像
@@ -42,8 +44,7 @@ CMD ["/bin/bash"]
 ENTRYPOINT ["java","-jar","-Xms2048m", "-Xmx2048m", "-XX:PermSize=256M", "-XX:MaxPermSize=256M","/usr/local/supervise-svc-0.0.1-SNAPSHOT.jar"]
 ```
 
-<!--more-->
-```
+``` dockerfile
 #前端react项目
 
 #基础镜像
@@ -71,7 +72,7 @@ ENTRYPOINT /opt/run.sh
 ```
 - 基础命令
 
-```
+``` bash
 docker ps       #查看doker中正在运行的容器列表
 docker images   #查看docker中的镜像列表
 docker build    #将当前目录下的文件打包为镜像
@@ -89,7 +90,7 @@ docker stop     #停止容器运行
 配置文件例子
 docker-compose.yml
 
-```
+``` yaml
 version: '2.2'
 services:
   #项目名称，用docker-compose做管理时，每个项目用这里配置的名称进行单独管理
@@ -120,7 +121,7 @@ services:
 ```
 - 常用命令
 
-```
+``` bash
 docker-copmpose build       #打包镜像，后面不加项目名则打包所有配置了build的项目，可接多个项目名，用空格隔开
 docker-compose up -d        #后台运行项目，寻找本地镜像生成容器（若镜像更新则重启用新镜像生成容器），或者docker-compose.yml文件改变了也会进行更新容器，同样不接项目名为所有项目，也可以接多个项目名
 docker-compose logs -f      #查看日志，同上可接项目名
