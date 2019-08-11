@@ -7,7 +7,7 @@ tags:
     - Nginx
     - 转载
 comments: true
-thumbnail: /gallery/test.jpg
+thumbnail: /gallery/machi.png
 ---
 &emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。
 

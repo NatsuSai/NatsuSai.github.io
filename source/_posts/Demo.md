@@ -8,7 +8,7 @@ tags:
     - 格子裙
     - 放学五年目
 comments: true 
-thumbnail: /gallery/test.jpg
+thumbnail: /gallery/kantoku-colors.jpg
 ---
 test test！！
 

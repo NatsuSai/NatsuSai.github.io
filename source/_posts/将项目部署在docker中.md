@@ -7,7 +7,7 @@ tags:
     - docker
     - ops
 comments: true
-thumbnail: /gallery/test.jpg
+thumbnail: /gallery/machi.png
 ---
 docker中有两个概念，容器与镜像。 
 
