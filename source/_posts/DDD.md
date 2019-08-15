@@ -9,6 +9,7 @@ tags:
     - Event Sourcing
 comments: true 
 thumbnail: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
+toc: true
 ---
 领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。
 
@@ -16,6 +17,23 @@ thumbnail: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
 <!--more-->
 
 > 我声明一点，本文章其实都是东拼西凑的，里面所表达的仅仅是个人的理解（我没有读完ddd那本书）
+
+# 通用语言(Ubiquitous Language)
+通用语言其实就是把模型通过大家都能够理解的语言表达出来。
+
+通常我们在开发业务的过程中都是先去调研，了解其业务的具体细节，并商讨大致的程序设计，然后经过开发人员转化成为代码，在这个过程中交流是单向性的，直到下一次需要展示或者有理解出现错误时才会与客户或者是业务人员再次交流。
+
+而业务人员那边通常也只能通过表面的程序看问题，无法理解其实际运作是否符合业务人员所想，这可能将导致程序在错误的方向上越走越远
+
+领域驱动设计是需要建立一个通用语言的，这需要领域专家(即对这些业务整体非常熟悉的人)与开发人员一同参与
+
+我们需要把程序设计上的事情通过一个通用的语言表述出去使领域专家能够理解我们是如何通过程序设计业务的，而领域专家也同样需要把那些专业名词，业务场景用通用语言描述出来
+
+当我们有了通用语言后，我们就能够在建立领域对象的时候听取专家的意见，同时能够让专家理解领域对象是否符合他们的预期  
+
+而形成通用语言是不容易的，因为其答案并不唯一，不同的人会有不同的理解，从而导致不同的答案。但我们可以试着从UML或是伪代码着手
+
+
 
 # 层结构(Layered Architecture)
 ![Layered Architecture](p29.png)
@@ -32,62 +50,6 @@ thumbnail: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
 ![Model-Driven Design](p28.png)
 ## 服务(Services)
 当我们在分析某一领域时，一直在尝试如何将信息转化为领域模型，但并非所有的点我们都能用Model来涵盖。对象应当有属性，状态和行为，但有时领域中有一些行为是无法映射到具体的对象中的，我们也不能强行将其放入在某一个模型对象中，而将其单独作为一个方法又没有地方，此时就需要服务
-
-### 引用书上的例子
-> 预定一艘船在一次航程中要运载的货物  
-> 应用程序的任务：将每个货物(Cargo)与航程(Voyage)关联起来，记录并跟踪这种关系
-
-那么它可能含有类似以下的代码：
-
-```
-//预定
-public int makeBooking(Cargo cargo, Voyage voyage){
-    int confirmation = orderConfirmationSequence.next();//订单确认序列
-    voyage.addCargo(cargo, confirmation);
-    return confirmation;
-}
-```
-
-因为总有人临时取消订单，所以一般来说航运业的做法都是接受比运载能力多一点的货物，即“超订”。这是一个基本政策。
-
-所以需求文档还有个要求：**允许10%超订**
-
-```
-//预定
-public int makeBooking(Cargo cargo, Voyage voyage){
-    //超订
-    double maxBooking = voyage.capacity() * 1.1;
-    if(voyage.bookedCargoSize() + cargo.size() > maxBooking) 
-        return -1;
-    
-    int confirmation = orderConfirmationSequence.next();//订单确认序列
-    voyage.addCargo(cargo, confirmation);
-    return confirmation;
-}
-```
-上面这段代码隐含了超订的规则，但是却跟预定绑在一起了，，同时也会让别人难以理解到其中的含义，当这个规则开始复杂化后则会让预定变得难以处理
-
-我们可以尝试应策略模式改进:
-```
-//预定
-public int makeBooking(Cargo cargo, Voyage voyage){
-    //超订
-    if(overbookingpolicy.isAllowed(cargo, voyage)) 
-        return -1;
-    
-    int confirmation = orderConfirmationSequence.next();//订单确认序列
-    voyage.addCargo(cargo, confirmation);
-    return confirmation;
-}
-```
-超订政策类(OverbookingPolicy)里面应该包含以下方法：
-```
-public boolean isAllowed(Cargo cargo, Voyage voyage){
-    return (cargo.size + voyage.bookedCargoSize()) <= (voyage.capality() * 1.1);
-}
-```
-
-这样我们就能够很明确的知道，超订是一项独特的政策，他的实现非常明确且独立。
 
 ## 工厂(Factories)  
 在大型系统中，实体和聚合通常是很复杂的，这就导致了很难去通过构造器来创建对象。工厂就决解了这个问题，它把创建对象的细节封装起来，巧妙的实现了依赖反转。当然对聚合也适用（当建立了聚合根时，其他对象可以自动创建）
@@ -149,9 +111,9 @@ Order {
 - 不具备生命周期
     
 ## 聚合(Aggregates) 和 聚合(Aggregate Root)  
-`聚合`可以看作是多个实体之间的组合，而每个聚合都有一个根实体，叫`聚合根`。
+**聚合**可以看作是多个实体之间的组合，而每个聚合都有一个根实体，叫**聚合根**。
 
-在DDD当中，聚合外部想要访问聚合内的信息，必须通过`聚合根`进行访问。
+在DDD当中，聚合外部想要访问聚合内的信息，必须通过**聚合根**进行访问。
 
 - 如何识别聚合和聚合根？
 首先一个边界上下文(Bounded Context)可能包含多个聚合，每个聚合都有一个聚合根。
@@ -167,13 +129,22 @@ Order {
 - 如何找到聚合根？
 如果存在一个业务操作是完全面向某个实体，那么这个实体就可能是一个聚合根
 
-- 例子分析
-> Order（一 个订单）必须有对应的客户信息，否则就不能称为一个有效的Order；同理，Order对OrderLineItem有不变性约束，Order也必须至少有一个OrderLineItem(一条订单明细)，否 则就不能称为一个有效的Order；另外，Order中的任何OrderLineItem的数量都不能为0，否则认为该OrderLineItem是无效 的，同时可以推理出Order也可能是无效的。因为如果允许一个OrderLineItem的数量为0的话，就意味着可能会出现所有 OrderLineItem的数量都为0，这就导致整个Order的总价为0，这是没有任何意义的，是不允许的，从而导致Order无效；所以，必须要求 Order中所有的OrderLineItem的数量都不能为0；那么现在可以确定的是Order必须包含一些OrderLineItem，那么应该是通 过引用的方式还是ID关联的方式来表达这种包含关系呢？这就需要引出另外一个问题，那就是先要分析出是OrderLineItem是否是一个独立的聚合 根。回答了这个问题，那么根据上面的规则就知道应该用对象引用还是用ID关联了。那么OrderLineItem是否是一个独立的聚合根呢？因为聚合根意 味着是某个聚合的根，而聚合有代表着某个上下文边界，而一个上下文边界又代表着某个独立的业务场景，这个业务场景操作的唯一对象总是该上下文边界内的聚合 根。想到这里，我们就可以想想，有没有什么场景是会绕开订单直接对某个订单明细进行操作的。也就是在这种情况下，我们 是以OrderLineItem为主体，完全是在面向OrderLineItem在做业务操作。有这种业务场景吗？没有，我们对 OrderLineItem的所有的操作都是以Order为出发点，我们总是会面向整个Order在做业务操作，比如向Order中增加明细，修改 Order的某个明细对应的商品的购买数量，从Order中移除某个明细，等等类似操作，我们从来不会从OrderlineItem为出发点去执行一些业 务操作；另外，从生命周期的角度去理解，那么OrderLineItem离开Order没有任何存在的意义，也就是说OrderLineItem的生命周 期是从属于Order的。所以，我们可以很确信的回答，OrderLineItem是一个实体。
+### 例子分析
+>Order（一 个订单）必须有对应的客户信息，否则就不能称为一个有效的Order  
+同理，Order对OrderLineItem有不变性约束，Order也必须至少有一个OrderLineItem(一条订单明细)，否则就不能称为一个有效的Order  
+另外，Order中的任何OrderLineItem的数量都不能为0，否则认为该OrderLineItem是无效的，同时可以推理出Order也可能是无效的。因为如果允许一个OrderLineItem的数量为0的话，就意味着可能会出现所有OrderLineItem的数量都为0，这就导致整个Order的总价为0，这是没有任何意义的，是不允许的，从而导致Order无效  
+所以，必须要求 Order中所有的OrderLineItem的数量都不能为0  
+那么现在可以确定的是Order必须包含一些OrderLineItem，那么应该是通 过引用的方式还是ID关联的方式来表达这种包含关系呢？  
+这就需要引出另外一个问题，那就是先要分析出是OrderLineItem是否是一个独立的聚合根。  
+回答了这个问题，那么根据上面的规则就知道应该用对象引用还是用ID关联了。那么OrderLineItem是否是一个独立的聚合根呢？因为聚合根意 味着是某个聚合的根，而聚合有代表着某个上下文边界，而一个上下文边界又代表着某个独立的业务场景，这个业务场景操作的唯一对象总是该上下文边界内的聚合 根。想到这里，我们就可以想想，有没有什么场景是会绕开订单直接对某个订单明细进行操作的。也就是在这种情况下，我们 是以OrderLineItem为主体，完全是在面向OrderLineItem在做业务操作。有这种业务场景吗？没有，我们对 OrderLineItem的所有的操作都是以Order为出发点，我们总是会面向整个Order在做业务操作，比如向Order中增加明细，修改 Order的某个明细对应的商品的购买数量，从Order中移除某个明细，等等类似操作，我们从来不会从OrderlineItem为出发点去执行一些业 务操作；另外，从生命周期的角度去理解，那么OrderLineItem离开Order没有任何存在的意义，也就是说OrderLineItem的生命周 期是从属于Order的。所以，我们可以很确信的回答，OrderLineItem是一个实体。
 
-# CQRS 和 Event Souring
-//TODO
-
+# Event Souring(事件溯源)
 ![Event Souring](v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg)
-![Event Souring + CQRS](v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg)
+
+![Event Souring](v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg)
+
+# CQRS(命令查询责任分离)
+CQRS
+![CQRS + Event Souring](CQRS.jpg)
 
 

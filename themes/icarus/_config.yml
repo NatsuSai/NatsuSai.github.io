@@ -23,11 +23,11 @@ open_graph:
 navbar:
   # Navigation bar menu links
   menu:
-    Home: /
-    Archives: /archives
-    Categories: /categories
-    Tags: /tags
-    About: /about
+    主页: /
+    文章: /archives
+    分类: /categories
+    标签: /tags
+    关于: /about
   # Navigation bar links to be shown on the right
   links:
 #        Github:
@@ -50,7 +50,7 @@ footer:
 article:
   # Code highlight theme
   # https://github.com/highlightjs/highlight.js/tree/master/src/styles
-  highlight: androidstudio
+  highlight: github
   # Whether to show article thumbnail images
   thumbnail: true
   # Whether to show estimate article reading time
@@ -138,9 +138,9 @@ widgets:
       #            Facebook:
       #                icon: fab fa-facebook
       #                url: 'https://facebook.com'
-      Twitter:
-        icon: fab fa-twitter
-        url: 'https://twitter.com/kurenai233'
+#      Twitter:
+#        icon: fab fa-twitter
+#        url: 'https://twitter.com/kurenai233'
       #            Dribbble:
       #                icon: fab fa-dribbble
       #                url: 'https://dribbble.com'
@@ -158,9 +158,9 @@ widgets:
     # Where should the widget be placed, left or right
     position: left
     # Links to be shown in the links widget
-    links:
-      Hexo: 'https://hexo.io'
-      PPOffice: 'https://github.com/ppoffice'
+#    links:
+#      Hexo: 'https://hexo.io'
+#      PPOffice: 'https://github.com/ppoffice'
   -
     # Widget name
     type: category
