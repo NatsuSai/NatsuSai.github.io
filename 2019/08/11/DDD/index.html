@@ -16,7 +16,7 @@
 <meta property="og:description" content="领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。 这个设计思想是在微服务开始流行时逐渐变得火爆的，因为其设计理念非常适合分布式的微服务拆分。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/gallery/FINAL%20FANTASY%20XIV%20SHADOWBRINGERS.png">
-<meta property="og:updated_time" content="2019-08-14T12:07:21.203Z">
+<meta property="og:updated_time" content="2019-08-15T18:28:47.919Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Re：从零开始的领域驱动设计">
 <meta name="twitter:description" content="领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。 这个设计思想是在微服务开始流行时逐渐变得火爆的，因为其设计理念非常适合分布式的微服务拆分。">
@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/androidstudio.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/github.css">
 
 
     
@@ -117,6 +117,10 @@
             <div class="navbar-end">
                 
                 
+                <a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;">
+                    <i class="fas fa-list-ul"></i>
+                </a>
+                
                 
                 <a class="navbar-item search" title="搜索" href="javascript:;">
                     <i class="fas fa-search"></i>
@@ -152,7 +156,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    18 分钟 读完 (大约 2675 个字)
+                    18 分钟 读完 (大约 2749 个字)
                 </span>
                 
                 
@@ -170,6 +174,13 @@
 <blockquote>
 <p>我声明一点，本文章其实都是东拼西凑的，里面所表达的仅仅是个人的理解（我没有读完ddd那本书）</p>
 </blockquote>
+<h1 id="通用语言-Ubiquitous-Language"><a href="#通用语言-Ubiquitous-Language" class="headerlink" title="通用语言(Ubiquitous Language)"></a>通用语言(Ubiquitous Language)</h1><p>通用语言其实就是把模型通过大家都能够理解的语言表达出来。</p>
+<p>通常我们在开发业务的过程中都是先去调研，了解其业务的具体细节，并商讨大致的程序设计，然后经过开发人员转化成为代码，在这个过程中交流是单向性的，直到下一次需要展示或者有理解出现错误时才会与客户或者是业务人员再次交流。</p>
+<p>而业务人员那边通常也只能通过表面的程序看问题，无法理解其实际运作是否符合业务人员所想，这可能将导致程序在错误的方向上越走越远</p>
+<p>领域驱动设计是需要建立一个通用语言的，这需要领域专家(即对这些业务整体非常熟悉的人)与开发人员一同参与</p>
+<p>我们需要把程序设计上的事情通过一个通用的语言表述出去使领域专家能够理解我们是如何通过程序设计业务的，而领域专家也同样需要把那些专业名词，业务场景用通用语言描述出来</p>
+<p>当我们有了通用语言后，我们就能够在建立领域对象的时候听取专家的意见，同时能够让专家理解领域对象是否符合他们的预期  </p>
+<p>而形成通用语言是不容易的，因为其答案并不唯一，不同的人会有不同的理解，从而导致不同的答案。但我们可以试着从UML或是伪代码着手</p>
 <h1 id="层结构-Layered-Architecture"><a href="#层结构-Layered-Architecture" class="headerlink" title="层结构(Layered Architecture)"></a>层结构(Layered Architecture)</h1><p><img src="/2019/08/11/DDD/p29.png" alt="Layered Architecture"></p>
 <ul>
 <li>User Interface<br>负责向用户展现信息，并且会解析用户行为，即常说的展现层。</li>
@@ -179,18 +190,6 @@
 </ul>
 <h1 id="模型关系图-Model-Driven-Design"><a href="#模型关系图-Model-Driven-Design" class="headerlink" title="模型关系图(Model-Driven Design)"></a>模型关系图(Model-Driven Design)</h1><p><img src="/2019/08/11/DDD/p28.png" alt="Model-Driven Design"></p>
 <h2 id="服务-Services"><a href="#服务-Services" class="headerlink" title="服务(Services)"></a>服务(Services)</h2><p>当我们在分析某一领域时，一直在尝试如何将信息转化为领域模型，但并非所有的点我们都能用Model来涵盖。对象应当有属性，状态和行为，但有时领域中有一些行为是无法映射到具体的对象中的，我们也不能强行将其放入在某一个模型对象中，而将其单独作为一个方法又没有地方，此时就需要服务</p>
-<h3 id="引用书上的例子"><a href="#引用书上的例子" class="headerlink" title="引用书上的例子"></a>引用书上的例子</h3><blockquote>
-<p>预定一艘船在一次航程中要运载的货物<br>应用程序的任务：将每个货物(Cargo)与航程(Voyage)关联起来，记录并跟踪这种关系</p>
-</blockquote>
-<p>那么它可能含有类似以下的代码：</p>
-<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//预定</span><br><span class="line">public int makeBooking(Cargo cargo, Voyage voyage)&#123;</span><br><span class="line">    int confirmation = orderConfirmationSequence.next();//订单确认序列</span><br><span class="line">    voyage.addCargo(cargo, confirmation);</span><br><span class="line">    return confirmation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>因为总有人临时取消订单，所以一般来说航运业的做法都是接受比运载能力多一点的货物，即“超订”。这是一个基本政策。</p>
-<p>所以需求文档还有个要求：<strong>允许10%超订</strong></p>
-<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//预定</span><br><span class="line">public int makeBooking(Cargo cargo, Voyage voyage)&#123;</span><br><span class="line">    //超订</span><br><span class="line">    double maxBooking = voyage.capacity() * 1.1;</span><br><span class="line">    if(voyage.bookedCargoSize() + cargo.size() &gt; maxBooking) </span><br><span class="line">        return -1;</span><br><span class="line">    </span><br><span class="line">    int confirmation = orderConfirmationSequence.next();//订单确认序列</span><br><span class="line">    voyage.addCargo(cargo, confirmation);</span><br><span class="line">    return confirmation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上面这段代码隐含了超订的规则，但是却跟预定绑在一起了，，同时也会让别人难以理解到其中的含义，当这个规则开始复杂化后则会让预定变得难以处理</p>
-<p>我们可以尝试应策略模式改进:<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//预定</span><br><span class="line">public int makeBooking(Cargo cargo, Voyage voyage)&#123;</span><br><span class="line">    //超订</span><br><span class="line">    if(overbookingpolicy.isAllowed(cargo, voyage)) </span><br><span class="line">        return -1;</span><br><span class="line">    </span><br><span class="line">    int confirmation = orderConfirmationSequence.next();//订单确认序列</span><br><span class="line">    voyage.addCargo(cargo, confirmation);</span><br><span class="line">    return confirmation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>超订政策类(OverbookingPolicy)里面应该包含以下方法：<br><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean isAllowed(Cargo cargo, Voyage voyage)&#123;</span><br><span class="line">    return (cargo.size + voyage.bookedCargoSize()) &lt;= (voyage.capality() * 1.1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>这样我们就能够很明确的知道，超订是一项独特的政策，他的实现非常明确且独立。</p>
 <h2 id="工厂-Factories"><a href="#工厂-Factories" class="headerlink" title="工厂(Factories)"></a>工厂(Factories)</h2><p>在大型系统中，实体和聚合通常是很复杂的，这就导致了很难去通过构造器来创建对象。工厂就决解了这个问题，它把创建对象的细节封装起来，巧妙的实现了依赖反转。当然对聚合也适用（当建立了聚合根时，其他对象可以自动创建）</p>
 <h2 id="仓库-Repository"><a href="#仓库-Repository" class="headerlink" title="仓库(Repository)"></a>仓库(Repository)</h2><p>仓库封装了获取对象的逻辑，领域对象无须和底层数据库交互，它只需要从仓库中获取对象即可。仓库可以存储对象的引用，当一个对象被创建后，它可能会被存储到仓库中，那么下次就可以从仓库取。如果用户请求的数据没在仓库中，则会从数据库里取，这就减少了底层交互的次数</p>
 <h2 id="边界上下文-Bounded-Context"><a href="#边界上下文-Bounded-Context" class="headerlink" title="边界上下文(Bounded Context)"></a>边界上下文(Bounded Context)</h2><p>简单来说就是定义该领域模型的适用范围以及使用场景。</p>
@@ -212,8 +211,8 @@
 <li>不可变(只读)</li>
 <li>不具备生命周期</li>
 </ul>
-<h2 id="聚合-Aggregates-和-聚合-Aggregate-Root"><a href="#聚合-Aggregates-和-聚合-Aggregate-Root" class="headerlink" title="聚合(Aggregates) 和 聚合(Aggregate Root)"></a>聚合(Aggregates) 和 聚合(Aggregate Root)</h2><p><code>聚合</code>可以看作是多个实体之间的组合，而每个聚合都有一个根实体，叫<code>聚合根</code>。</p>
-<p>在DDD当中，聚合外部想要访问聚合内的信息，必须通过<code>聚合根</code>进行访问。</p>
+<h2 id="聚合-Aggregates-和-聚合-Aggregate-Root"><a href="#聚合-Aggregates-和-聚合-Aggregate-Root" class="headerlink" title="聚合(Aggregates) 和 聚合(Aggregate Root)"></a>聚合(Aggregates) 和 聚合(Aggregate Root)</h2><p><strong>聚合</strong>可以看作是多个实体之间的组合，而每个聚合都有一个根实体，叫<strong>聚合根</strong>。</p>
+<p>在DDD当中，聚合外部想要访问聚合内的信息，必须通过<strong>聚合根</strong>进行访问。</p>
 <ul>
 <li><p>如何识别聚合和聚合根？<br>首先一个边界上下文(Bounded Context)可能包含多个聚合，每个聚合都有一个聚合根。</p>
 <ol>
@@ -230,14 +229,13 @@
 </li>
 <li><p>如何找到聚合根？<br>如果存在一个业务操作是完全面向某个实体，那么这个实体就可能是一个聚合根</p>
 </li>
-<li><p>例子分析</p>
-<blockquote>
-<p>Order（一 个订单）必须有对应的客户信息，否则就不能称为一个有效的Order；同理，Order对OrderLineItem有不变性约束，Order也必须至少有一个OrderLineItem(一条订单明细)，否 则就不能称为一个有效的Order；另外，Order中的任何OrderLineItem的数量都不能为0，否则认为该OrderLineItem是无效 的，同时可以推理出Order也可能是无效的。因为如果允许一个OrderLineItem的数量为0的话，就意味着可能会出现所有 OrderLineItem的数量都为0，这就导致整个Order的总价为0，这是没有任何意义的，是不允许的，从而导致Order无效；所以，必须要求 Order中所有的OrderLineItem的数量都不能为0；那么现在可以确定的是Order必须包含一些OrderLineItem，那么应该是通 过引用的方式还是ID关联的方式来表达这种包含关系呢？这就需要引出另外一个问题，那就是先要分析出是OrderLineItem是否是一个独立的聚合 根。回答了这个问题，那么根据上面的规则就知道应该用对象引用还是用ID关联了。那么OrderLineItem是否是一个独立的聚合根呢？因为聚合根意 味着是某个聚合的根，而聚合有代表着某个上下文边界，而一个上下文边界又代表着某个独立的业务场景，这个业务场景操作的唯一对象总是该上下文边界内的聚合 根。想到这里，我们就可以想想，有没有什么场景是会绕开订单直接对某个订单明细进行操作的。也就是在这种情况下，我们 是以OrderLineItem为主体，完全是在面向OrderLineItem在做业务操作。有这种业务场景吗？没有，我们对 OrderLineItem的所有的操作都是以Order为出发点，我们总是会面向整个Order在做业务操作，比如向Order中增加明细，修改 Order的某个明细对应的商品的购买数量，从Order中移除某个明细，等等类似操作，我们从来不会从OrderlineItem为出发点去执行一些业 务操作；另外，从生命周期的角度去理解，那么OrderLineItem离开Order没有任何存在的意义，也就是说OrderLineItem的生命周 期是从属于Order的。所以，我们可以很确信的回答，OrderLineItem是一个实体。</p>
-</blockquote>
-</li>
 </ul>
-<h1 id="CQRS-和-Event-Souring"><a href="#CQRS-和-Event-Souring" class="headerlink" title="CQRS 和 Event Souring"></a>CQRS 和 Event Souring</h1><p>//TODO</p>
-<p><img src="/2019/08/11/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" alt="Event Souring"><br><img src="/2019/08/11/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" alt="Event Souring + CQRS"></p>
+<h3 id="例子分析"><a href="#例子分析" class="headerlink" title="例子分析"></a>例子分析</h3><blockquote>
+<p>Order（一 个订单）必须有对应的客户信息，否则就不能称为一个有效的Order<br>同理，Order对OrderLineItem有不变性约束，Order也必须至少有一个OrderLineItem(一条订单明细)，否则就不能称为一个有效的Order<br>另外，Order中的任何OrderLineItem的数量都不能为0，否则认为该OrderLineItem是无效的，同时可以推理出Order也可能是无效的。因为如果允许一个OrderLineItem的数量为0的话，就意味着可能会出现所有OrderLineItem的数量都为0，这就导致整个Order的总价为0，这是没有任何意义的，是不允许的，从而导致Order无效<br>所以，必须要求 Order中所有的OrderLineItem的数量都不能为0<br>那么现在可以确定的是Order必须包含一些OrderLineItem，那么应该是通 过引用的方式还是ID关联的方式来表达这种包含关系呢？<br>这就需要引出另外一个问题，那就是先要分析出是OrderLineItem是否是一个独立的聚合根。<br>回答了这个问题，那么根据上面的规则就知道应该用对象引用还是用ID关联了。那么OrderLineItem是否是一个独立的聚合根呢？因为聚合根意 味着是某个聚合的根，而聚合有代表着某个上下文边界，而一个上下文边界又代表着某个独立的业务场景，这个业务场景操作的唯一对象总是该上下文边界内的聚合 根。想到这里，我们就可以想想，有没有什么场景是会绕开订单直接对某个订单明细进行操作的。也就是在这种情况下，我们 是以OrderLineItem为主体，完全是在面向OrderLineItem在做业务操作。有这种业务场景吗？没有，我们对 OrderLineItem的所有的操作都是以Order为出发点，我们总是会面向整个Order在做业务操作，比如向Order中增加明细，修改 Order的某个明细对应的商品的购买数量，从Order中移除某个明细，等等类似操作，我们从来不会从OrderlineItem为出发点去执行一些业 务操作；另外，从生命周期的角度去理解，那么OrderLineItem离开Order没有任何存在的意义，也就是说OrderLineItem的生命周 期是从属于Order的。所以，我们可以很确信的回答，OrderLineItem是一个实体。</p>
+</blockquote>
+<h1 id="Event-Souring-事件溯源"><a href="#Event-Souring-事件溯源" class="headerlink" title="Event Souring(事件溯源)"></a>Event Souring(事件溯源)</h1><p><img src="/2019/08/11/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" alt="Event Souring"></p>
+<p><img src="/2019/08/11/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" alt="Event Souring"></p>
+<h1 id="CQRS-命令查询责任分离"><a href="#CQRS-命令查询责任分离" class="headerlink" title="CQRS(命令查询责任分离)"></a>CQRS(命令查询责任分离)</h1><p>CQRS<br><img src="/2019/08/11/DDD/CQRS.jpg" alt="CQRS + Event Souring"></p>
 
         </div>
         
@@ -370,6 +368,65 @@
 </div>
     
         
+<div class="card widget" id="toc">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                目录
+            </h3>
+            <ul class="menu-list"><li>
+        <a class="is-flex" href="#通用语言-Ubiquitous-Language">
+        <span class="has-mr-6">1</span>
+        <span>通用语言(Ubiquitous Language)</span>
+        </a></li><li>
+        <a class="is-flex" href="#层结构-Layered-Architecture">
+        <span class="has-mr-6">2</span>
+        <span>层结构(Layered Architecture)</span>
+        </a></li><li>
+        <a class="is-flex" href="#模型关系图-Model-Driven-Design">
+        <span class="has-mr-6">3</span>
+        <span>模型关系图(Model-Driven Design)</span>
+        </a><ul class="menu-list"><li>
+        <a class="is-flex" href="#服务-Services">
+        <span class="has-mr-6">3.1</span>
+        <span>服务(Services)</span>
+        </a></li><li>
+        <a class="is-flex" href="#工厂-Factories">
+        <span class="has-mr-6">3.2</span>
+        <span>工厂(Factories)</span>
+        </a></li><li>
+        <a class="is-flex" href="#仓库-Repository">
+        <span class="has-mr-6">3.3</span>
+        <span>仓库(Repository)</span>
+        </a></li><li>
+        <a class="is-flex" href="#边界上下文-Bounded-Context">
+        <span class="has-mr-6">3.4</span>
+        <span>边界上下文(Bounded Context)</span>
+        </a></li><li>
+        <a class="is-flex" href="#实体-Entity-和-值对象-ValueObject">
+        <span class="has-mr-6">3.5</span>
+        <span>实体(Entity) 和 值对象(ValueObject)</span>
+        </a></li><li>
+        <a class="is-flex" href="#聚合-Aggregates-和-聚合-Aggregate-Root">
+        <span class="has-mr-6">3.6</span>
+        <span>聚合(Aggregates) 和 聚合(Aggregate Root)</span>
+        </a><ul class="menu-list"><li>
+        <a class="is-flex" href="#例子分析">
+        <span class="has-mr-6">3.6.1</span>
+        <span>例子分析</span>
+        </a></li></ul></li></ul></li><li>
+        <a class="is-flex" href="#Event-Souring-事件溯源">
+        <span class="has-mr-6">4</span>
+        <span>Event Souring(事件溯源)</span>
+        </a></li><li>
+        <a class="is-flex" href="#CQRS-命令查询责任分离">
+        <span class="has-mr-6">5</span>
+        <span>CQRS(命令查询责任分离)</span>
+        </a></li></ul>
+        </div>
+    </div>
+</div>
+
     
         
 
