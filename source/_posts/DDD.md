@@ -34,6 +34,7 @@ toc: true
 而形成通用语言是不容易的，因为其答案并不唯一，不同的人会有不同的理解，从而导致不同的答案。但我们可以试着从UML或是伪代码着手
 
 
+[航运例子](http://note.youdao.com/noteshare?id=3834bfbae566164a48b0df825fc8134d&sub=B24036AF24534B79875E2C0B5D4C886F)
 
 # 层结构(Layered Architecture)
 ![Layered Architecture](p29.png)
@@ -153,5 +154,13 @@ Event Souring是Martin Fowler提出的一种架构模式，其特点是：
 # CQRS(命令查询责任分离)
 CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及  
 ![CQRS + Event Souring](CQRS.jpg)
+
+参考资料：
+- 《领域驱动设计：软件核心复杂性应对之道》  
+- [深入浅出Event Sourcing和CQRS](https://zhuanlan.zhihu.com/p/38968012)
+- [Re：从零开始的领域驱动设计](https://www.cnkirito.moe/Re-DDD/)
+- [一个DDD指导下的实体类设计案例](https://www.cnkirito.moe/DDD-practice/)
+- [DDD领域驱动设计基本理论知识总结](https://www.cnblogs.com/netfocus/archive/2011/10/10/2204949.html)
+- [多研究些架构，少谈些框架](http://newtech.club/2017/06/09/%E5%A4%9A%E7%A0%94%E7%A9%B6%E4%BA%9B%E6%9E%B6%E6%9E%84%EF%BC%8C%E5%B0%91%E8%B0%88%E4%BA%9B%E6%A1%86%E6%9E%B6%EF%BC%881%EF%BC%89-%E8%AE%BA%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/)
 
 
