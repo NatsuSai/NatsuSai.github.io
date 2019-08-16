@@ -74,28 +74,28 @@ toc: true
 举个例子：
 在电商系统我们现在分成两个模块，一个商品模块，一个订单模块
 订单对象中有收货地址(address)
-```
-Order {
+```java
+class Order {
     int id;
     String address; 
 }
 ```
 我们把address扩展开来
-```
-Order {
+```java
+class Order {
     int id;
     Address address; 
 }
 
-Address {
+class Address {
     String province;//省
     String city;//市
     String street;//街道
 }
 ```
 现在Address是一个对象了，但是我们不会认为他是一个实体，因为在这个订单模块中它只是描述了订单中的收货地址而已，仅仅只是order上的一个值，几个内部的值所组合出的抽象，你完全可以把它理解为是一个Map:
-```
-Order {
+```java
+class Order {
     int id;
     Map<String, String> address;
     
@@ -139,12 +139,19 @@ Order {
 回答了这个问题，那么根据上面的规则就知道应该用对象引用还是用ID关联了。那么OrderLineItem是否是一个独立的聚合根呢？因为聚合根意 味着是某个聚合的根，而聚合有代表着某个上下文边界，而一个上下文边界又代表着某个独立的业务场景，这个业务场景操作的唯一对象总是该上下文边界内的聚合 根。想到这里，我们就可以想想，有没有什么场景是会绕开订单直接对某个订单明细进行操作的。也就是在这种情况下，我们 是以OrderLineItem为主体，完全是在面向OrderLineItem在做业务操作。有这种业务场景吗？没有，我们对 OrderLineItem的所有的操作都是以Order为出发点，我们总是会面向整个Order在做业务操作，比如向Order中增加明细，修改 Order的某个明细对应的商品的购买数量，从Order中移除某个明细，等等类似操作，我们从来不会从OrderlineItem为出发点去执行一些业 务操作；另外，从生命周期的角度去理解，那么OrderLineItem离开Order没有任何存在的意义，也就是说OrderLineItem的生命周 期是从属于Order的。所以，我们可以很确信的回答，OrderLineItem是一个实体。
 
 # Event Souring(事件溯源)
+Event Souring是Martin Fowler提出的一种架构模式，其特点是：
+- 整个系统由事件进行驱动
+- 事件是一等公民，系统的基础数据是事件，事件需要被储存在数据库中
+- 业务数据只是由事件产生的视图，不一定需要存储在数据库
+
+这里展示的例子是一个银行账户经历的几个事件：创建 -> 存款300 -> 存款100 -> 取出200
 ![Event Souring](v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg)
 
+在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可
 ![Event Souring](v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg)
 
 # CQRS(命令查询责任分离)
-CQRS
+CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及  
 ![CQRS + Event Souring](CQRS.jpg)
 
 
