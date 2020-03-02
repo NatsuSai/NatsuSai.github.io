@@ -4,7 +4,7 @@
 
 # Site
 title: Kurenai's World
-subtitle: 这里是Kurenai的世界
+subtitle: Welcome to My nightlife
 description: 君を見てると、心が震える
 author: Kurenai
 language: zh-CN
@@ -91,3 +91,7 @@ disqus_shortname: natsusai-github
 
 # Baidu Analytics
 baidu_analytics: 25e5b3f24bc7ddff2521cee9ff5d4e6a
+
+# 自动生成sitemap
+sitemap:
+  path: sitemap.xml
