@@ -1,0 +1,91 @@
+<%
+if (!page.banner_img) {
+  page.banner_img = theme.post.banner_img
+}
+page.banner_img_height = theme.post.banner_img_height
+%>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <%- page.content %>
+            <hr>
+          </div>
+          <br>
+          <div>
+            <div id="post-tag">
+              <% if (page.categories.length != 0) { %>
+                <span>
+                  <i class="iconfont icon-inbox"></i>
+                  <% page.categories.each(function(cate) { %>
+                    <a class="hover-with-bg" href="/categories/<%- encodeURI(cate.name).replace('.', '-') %>"><%= cate.name %></a>
+                    &nbsp;
+                  <% }) %>
+                </span>
+              <% } %>
+              <span>
+                <i class="iconfont icon-tag"></i>
+                <% page.tags.each(function(tag) { %>
+                  <a class="hover-with-bg" href="/tags/<%- encodeURI(tag.name).replace('.', '-') %>"><%= tag.name %></a>
+                <% }) %>
+              </span>
+            </div>
+            <% if(theme.post.copyright.enable && theme.post.copyright.content) { %>
+              <p class="note note-warning"><%- theme.post.copyright.content %></p>
+            <% } %>
+            <% if (page.prev || page.next){ %>
+              <div id="post-nav" class="container">
+                  <div class="row">
+                    <% if (page.prev){ %>
+                      <a href="<%- url_for(page.prev.path) %>" id="post-nav-prev" class="col">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="post-nav-title"><%= page.prev.title %></span>
+                      </a>
+                    <% } %>
+                    <% if (page.next){ %>
+                      <a href="<%- url_for(page.next.path) %>" id="post-nav-next" class="col">
+                        <span class="post-nav-title"><%= page.next.title %></span>
+                        <i class="fas fa-arrow-right"></i>
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- custom -->
+        <% if(theme.post.custom.enable) { %>
+          <div class="col-lg-7 mx-auto nopadding-md">
+            <div class="container custom post-content mx-auto">
+              <%- theme.post.custom.content %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Comments -->
+        <div class="col-lg-10 mx-auto nopadding-md">
+          <div class="container comments mx-auto" id="comments">
+            <% if(page.comments && theme.post.comments.enable) { %>
+             <br><br>
+              <% var type = '_partial/comments/' + theme.post.comments.type %>
+              <%- partial(type) %>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      <%- partial('_partial/toc') %>
+    </div>
+  </div>
+</div>
+
+
+
+
