@@ -2,11 +2,12 @@
 title: Re：从零开始的领域驱动设计
 date: 2019/8/11
 categories: 
-    - Coding
+    - Java
 tags: 
     - DDD
     - CQRS
     - Event Sourcing
+    - Java
 comments: true 
 banner_img: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
 index_img: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
