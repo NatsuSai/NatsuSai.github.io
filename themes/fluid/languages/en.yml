@@ -2,12 +2,10 @@ search:
   title: Search
   keyword: keyword
   status:
-    success: v 
+    success: v
     error: x
 
 postTotal: "%d posts in total."
-
-pageTotal: "%d posts in page."
 
 paginator:
   pre: Previous
@@ -15,17 +13,22 @@ paginator:
 
 post:
   toc: TOC
+  pre: Previous
+  next: Next
+
+home:
+  title: Home
 
 archive:
-  title: Archive
+  title: Archives
   subtitle: Archive
 
 tag:
-  title: Tag
+  title: Tags
   subtitle: Tag
 
 category:
-  title: Category
+  title: Categories
   subtitle: Category
 
 about:
@@ -35,3 +38,7 @@ about:
 page404:
   title: Page not found
   subtitle: Oops, Page not found...
+
+links:
+  title: Links
+  subtitle: Links

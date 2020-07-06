@@ -1,6 +1,6 @@
-<% if(theme.fun_features.typing.enable){ %>
+<% if(theme.fun_features.typing.enable && page.subtitle !== false){ %>
   <%- js_ex(theme.static_prefix.typed, "/typed.min.js") %>
-  <script type="text/javascript">
+  <script>
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',

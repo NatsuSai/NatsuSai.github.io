@@ -9,8 +9,6 @@ tags:
     - Event Sourcing
     - Java
 comments: true 
-banner_img: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
-index_img: /gallery/FINAL FANTASY XIV SHADOWBRINGERS.png
 toc: true
 ---
 领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。
@@ -39,7 +37,7 @@ toc: true
 [航运例子](http://note.youdao.com/noteshare?id=3834bfbae566164a48b0df825fc8134d&sub=B24036AF24534B79875E2C0B5D4C886F)
 
 # 层结构(Layered Architecture)
-![Layered Architecture](/img/DDD/p29.png)
+![Layered Architecture](p29.png)
 - User Interface  
 负责向用户展现信息，并且会解析用户行为，即常说的展现层。
 - Application Layer  
@@ -50,7 +48,7 @@ toc: true
 为其他层提供底层依赖操作。
 
 # 模型关系图(Model-Driven Design)
-![Model-Driven Design](/img/DDD/p28.png)
+![Model-Driven Design](p28.png)
 ## 服务(Services)
 当我们在分析某一领域时，一直在尝试如何将信息转化为领域模型，但并非所有的点我们都能用Model来涵盖。对象应当有属性，状态和行为，但有时领域中有一些行为是无法映射到具体的对象中的，我们也不能强行将其放入在某一个模型对象中，而将其单独作为一个方法又没有地方，此时就需要服务
 
@@ -148,14 +146,14 @@ Event Souring是Martin Fowler提出的一种架构模式，其特点是：
 - 业务数据只是由事件产生的视图，不一定需要存储在数据库
 
 这里展示的例子是一个银行账户经历的几个事件：创建 -> 存款300 -> 存款100 -> 取出200
-![Event Souring](/img/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg)
+![Event Souring](v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg)
 
 在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可
-![Event Souring](/img/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg)
+![Event Souring](v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg)
 
 # CQRS(命令查询责任分离)
 CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及  
-![CQRS + Event Souring](/img/DDD/CQRS.jpg)
+![CQRS + Event Souring](CQRS.jpg)
 
 参考资料：
 - 《领域驱动设计：软件核心复杂性应对之道》  

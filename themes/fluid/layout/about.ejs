@@ -1,30 +1,34 @@
 <%
 page.layout = "about"
-page.title = __('about.title')
-page.subtitle = __('about.subtitle')
+page.title = theme.about.title || __('about.title')
+page.subtitle = theme.about.subtitle || __('about.subtitle')
 page.banner_img = theme.about.banner_img
 page.banner_img_height = theme.about.banner_img_height
+page.banner_mask_alpha = theme.about.banner_mask_alpha
 %>
 
 <div class="text-center">
-  <p class="h3"><%= theme.about.name %></p>
-  <p><%- theme.about.introduce %></p>
-  <% for(var i in theme.about.icons) { %>
-    <a href="<%- theme.about.icons[i] %>" class="h4"><i class="<%- i %>" aria-hidden="true"></i></a>
-    &nbsp;&nbsp;
-  <% } %>
+  <div class="about-info">
+    <div class="about-name"><%- theme.about.name %></div>
+    <div class="about-intro"><%- theme.about.introduce %></div>
+    <div class="about-icons">
+      <% for(const each of theme.about.icons) { %>
+        <% if (!each.class) continue; %>
+        <% var cls = each.class %>
+        <% var isQr = each.qrcode %>
+        <a href="<%= isQr ? 'javascript:;' : url_for(each.link) %>" class="<%= isQr ? 'qr-trigger' : '' %>
+           <%= !isQr && each.tip ? 'hint--bottom hint--rounded' : '' %>"
+           <%= !isQr && each.tip ? 'aria-label=' + each.tip : '' %>
+        >
+          <i class="<%= cls %>" aria-hidden="true"></i>
+          <% if (isQr) { %>
+            <img class="qr-img" src="<%= url_for(each.qrcode) %>" alt="qrcode" />
+          <% } %>
+        </a>
+      <% } %>
+    </div>
+  </div>
 </div>
 <div class="mt-5 markdown-body">
-  <%- about_body() %>
-</div>
-
-<!-- Comments -->
-<div class="col-lg-12 mx-auto nopadding-md">
-  <div class="container comments mx-auto" id="comments">
-    <% if(theme.post.comments.enable) { %>
-      <br><br>
-      <% var type = '_partial/comments/' + theme.post.comments.type %>
-      <%- partial(type) %>
-    <% } %>
-  </div>
+  <%- page.content %>
 </div>

@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "hexo": "^3.2.2",
-    "hexo-asset-image": "1.0.0",
+    "hexo-asset-image": "https://github.com/NatsuSai/hexo-asset-image",
     "hexo-cli": "^2.0.0",
     "hexo-deployer-git": "^1.0.0",
     "hexo-generator-archive": "^0.1.4",
