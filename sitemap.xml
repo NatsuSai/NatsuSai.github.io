@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://natsusai.github.io/about/index.html</loc>
+    
+    <lastmod>2020-07-06T09:43:36.286Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://natsusai.github.io/2017/04/20/Demo/</loc>
     
     <lastmod>2020-07-06T09:22:45.112Z</lastmod>
@@ -17,13 +24,6 @@
   
   <url>
     <loc>https://natsusai.github.io/2020/03/03/lean-pulishOn-of-reactor/</loc>
-    
-    <lastmod>2020-07-06T07:17:24.166Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://natsusai.github.io/about/index.html</loc>
     
     <lastmod>2020-07-06T07:17:24.166Z</lastmod>
     
