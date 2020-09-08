@@ -1,7 +1,7 @@
+
+
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
@@ -23,9 +23,9 @@
 
 
 <!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_pf9vaxs7x7b.css">
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
 
 <link rel="stylesheet" href="/css/main.css">
 
@@ -33,6 +33,7 @@
 
 
   <script src="/js/utils.js"></script>
+  <script src="/js/color-schema.js"></script>
 </head>
 
 
@@ -115,8 +116,14 @@
         
         
           <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
       </ul>
@@ -124,12 +131,12 @@
   </div>
 </nav>
 
-    <div class="view intro-2" id="background" parallax=true
+    <div class="banner intro-2" id="background" parallax=true
          style="background: url('/gallery/machi.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="container text-center white-text fadeInUp">
+          <div class="container page-header text-center fade-in-up">
             <span class="h2" id="subtitle">
               
             </span>
@@ -162,21 +169,29 @@
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/03/03/lean-pulishOn-of-reactor/">Reactor处理阻塞问题笔记</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2020/09/08/context-of-reactor/">Reactor中的上下文</a>
+      </h1>
 
-      <a href="/2020/03/03/lean-pulishOn-of-reactor/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/09/08/context-of-reactor/">
           
-        
-        <div>其实本来想要记录问题的过程，但奈何自己也说不太好XD</div>
-      </a>
+          
+            
+          
+          由于参与的项目当中决定用 spring-cloud-gateway 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    
+这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2020-03-03
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-09-08 22:53" pubdate>
+              2020-09-08
+            </time>
           </div>
         
         
@@ -184,6 +199,8 @@
             <i class="iconfont icon-category"></i>
             
               <a href="/categories/Java/">Java</a>
+            
+              <a href="/categories/Java/Reactor/">Reactor</a>
             
           </div>
         
@@ -195,31 +212,97 @@
             
               <a href="/tags/Reactor/">Reactor</a>
             
+              <a href="/tags/Webflux/">Webflux</a>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2019/08/11/DDD/">Re：从零开始的领域驱动设计</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2020/03/03/lean-pulishOn-of-reactor/">Reactor处理阻塞问题笔记</a>
+      </h1>
 
-      <a href="/2019/08/11/DDD/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2020/03/03/lean-pulishOn-of-reactor/">
           
-        
-        <div>领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。
-这个设计思想是在微服务开始流行时逐渐变得火爆的，因为其设计理念非常适合分布式的微服务拆分。</div>
-      </a>
+          
+            
+          
+          其实本来想要记录问题的过程，但奈何自己也说不太好XD
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2019-08-11
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-03-03 09:53" pubdate>
+              2020-03-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Java/">Java</a>
+            
+              <a href="/categories/Java/Reactor/">Reactor</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">Java</a>
+            
+              <a href="/tags/Reactor/">Reactor</a>
+            
+              <a href="/tags/Webflux/">Webflux</a>
+            
+              <a href="/tags/Spring/">Spring</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2019/08/11/DDD/">Re：从零开始的领域驱动设计</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/08/11/DDD/">
+          
+          
+            
+          
+          领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。
+这个设计思想是在微服务开始流行时逐渐变得火爆的，因为其设计理念非常适合分布式的微服务拆分。
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-08-11 00:00" pubdate>
+              2019-08-11
+            </time>
           </div>
         
         
@@ -245,29 +328,36 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2019/03/14/将项目部署在docker中/">将项目部署在docker中</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2019/03/14/将项目部署在docker中/">将项目部署在docker中</a>
+      </h1>
 
-      <a href="/2019/03/14/将项目部署在docker中/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2019/03/14/将项目部署在docker中/">
           
-        
-        <div>docker中有两个概念，容器与镜像。 
+          
+            
+          
+          docker中有两个概念，容器与镜像。 
 镜像我们可以简单的理解为是装机用的光盘，而容器就是我们用光盘所装的一个系统。实际上我们就是由镜像生成一个容器，一个镜像可以生成多个容器（只要容器互不相冲突）。
-而镜像的生成就是由配置文件来决定（配置文件参数可由后期运行指令等等操作更改），具体如何配置不详细说明。</div>
-      </a>
+而镜像的生成就是由配置文件来决定（配置文件参数可由后期运行指令等等操作更改），具体如何配置不详细说明。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2019-03-14
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-03-14 11:39" pubdate>
+              2019-03-14
+            </time>
           </div>
         
         
@@ -289,27 +379,34 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2018/12/30/Nginx基础——Rewrite规则/">Nginx基础——Rewrite规则</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2018/12/30/Nginx基础——Rewrite规则/">Nginx基础——Rewrite规则</a>
+      </h1>
 
-      <a href="/2018/12/30/Nginx基础——Rewrite规则/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2018/12/30/Nginx基础——Rewrite规则/">
           
-        
-        <div>&emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。</div>
-      </a>
+          
+            
+          
+          &emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2018-12-30
+            <i class="iconfont icon-date"></i>
+            <time datetime="2018-12-30 15:13" pubdate>
+              2018-12-30
+            </time>
           </div>
         
         
@@ -331,27 +428,34 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2017/05/20/とある三秋 缒的一些摘抄/">とある三秋 缒の摘抄</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2017/05/20/とある三秋 缒的一些摘抄/">とある三秋 缒の摘抄</a>
+      </h1>
 
-      <a href="/2017/05/20/とある三秋 缒的一些摘抄/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2017/05/20/とある三秋 缒的一些摘抄/">
           
-        
-        <div>记录一下比较打动我的一些段落</div>
-      </a>
+          
+            
+          
+          记录一下比较打动我的一些段落
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2017-05-20
+            <i class="iconfont icon-date"></i>
+            <time datetime="2017-05-20 00:00" pubdate>
+              2017-05-20
+            </time>
           </div>
         
         
@@ -368,7 +472,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
@@ -376,25 +480,32 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2017/04/20/Demo/" target="_self">
-          <img src="/gallery/kantoku-colors.jpg" alt="Test">
+          <img src="/gallery/kantoku-colors.jpg" srcset="/img/loading.gif" alt="Test">
         </a>
       </div>
     
-    <div class="col-12 col-md-8 mx-auto index-info">
-      <a class="index-header" href="/2017/04/20/Demo/">Test</a>
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2017/04/20/Demo/">Test</a>
+      </h1>
 
-      <a href="/2017/04/20/Demo/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2017/04/20/Demo/">
           
-        
-        <div>test test！！</div>
-      </a>
+          
+            
+          
+          test test！！
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2017-04-20
+            <i class="iconfont icon-date"></i>
+            <time datetime="2017-04-20 00:00" pubdate>
+              2017-04-20
+            </time>
           </div>
         
         
@@ -418,27 +529,34 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
   <div class="row mx-auto index-card">
     
     
-    <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2017/03/20/hello-world/">Hello World</a>
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        <a href="/2017/03/20/hello-world/">Hello World</a>
+      </h1>
 
-      <a href="/2017/03/20/hello-world/" class="index-excerpt">
-        
-        
+      <p class="index-excerpt">
+        <a href="/2017/03/20/hello-world/">
           
-        
-        <div>Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.</div>
-      </a>
+          
+            
+          
+          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+        </a>
+      </p>
 
       <div class="index-btm post-metas">
         
           <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>&nbsp;2017-03-20
+            <i class="iconfont icon-date"></i>
+            <time datetime="2017-03-20 00:00" pubdate>
+              2017-03-20
+            </time>
           </div>
         
         
@@ -451,7 +569,7 @@
           </div>
         
       </div>
-    </div>
+    </article>
   </div>
 
 
@@ -509,30 +627,6 @@
         <span>Fluid</span></a>
     </div>
     
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- 不蒜子统计PV -->
-        <span id="busuanzi_container_site_pv" style="display: none">
-            总访问量 
-            <span id="busuanzi_value_site_pv"></span>
-             次
-          </span>
-      
-      
-        <!-- 不蒜子统计UV -->
-        <span id="busuanzi_container_site_uv" style="display: none">
-            总访客数 
-            <span id="busuanzi_value_site_uv"></span>
-             人
-          </span>
-      
-    
-  </div>
-
 
     
 
@@ -549,14 +643,20 @@
 <!-- Plugins -->
 
 
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
 
 
   <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
   <script  src="/js/clipboard-use.js" ></script>
 
 
-
-  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
 
 
 

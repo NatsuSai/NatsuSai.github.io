@@ -18,14 +18,14 @@
 <p>当我们有了通用语言后，我们就能够在建立领域对象的时候听取专家的意见，同时能够让专家理解领域对象是否符合他们的预期  </p>
 <p>而形成通用语言是不容易的，因为其答案并不唯一，不同的人会有不同的理解，从而导致不同的答案。但我们可以试着从UML或是伪代码着手</p>
 <p><a href="http://note.youdao.com/noteshare?id=3834bfbae566164a48b0df825fc8134d&sub=B24036AF24534B79875E2C0B5D4C886F" target="_blank" rel="noopener">航运例子</a></p>
-<h1 id="层结构-Layered-Architecture"><a href="#层结构-Layered-Architecture" class="headerlink" title="层结构(Layered Architecture)"></a>层结构(Layered Architecture)</h1><p><img src="/2019/08/11/DDD/p29.png" alt="Layered Architecture"></p>
+<h1 id="层结构-Layered-Architecture"><a href="#层结构-Layered-Architecture" class="headerlink" title="层结构(Layered Architecture)"></a>层结构(Layered Architecture)</h1><p><img src="/2019/08/11/DDD/p29.png" srcset="/img/loading.gif" alt="Layered Architecture"></p>
 <ul>
 <li>User Interface<br>负责向用户展现信息，并且会解析用户行为，即常说的展现层。</li>
 <li>Application Layer<br>应用层没有任何的业务逻辑代码，它很简单，它主要为程序提供任务处理。</li>
 <li>Domain Layer<br>这一层包含有关领域的信息，是业务的核心，领域模型的状态都直接或间接（持久化至数据库）存储在这一层。</li>
 <li>Infrastructure Layer<br>为其他层提供底层依赖操作。</li>
 </ul>
-<h1 id="模型关系图-Model-Driven-Design"><a href="#模型关系图-Model-Driven-Design" class="headerlink" title="模型关系图(Model-Driven Design)"></a>模型关系图(Model-Driven Design)</h1><p><img src="/2019/08/11/DDD/p28.png" alt="Model-Driven Design"></p>
+<h1 id="模型关系图-Model-Driven-Design"><a href="#模型关系图-Model-Driven-Design" class="headerlink" title="模型关系图(Model-Driven Design)"></a>模型关系图(Model-Driven Design)</h1><p><img src="/2019/08/11/DDD/p28.png" srcset="/img/loading.gif" alt="Model-Driven Design"></p>
 <h2 id="服务-Services"><a href="#服务-Services" class="headerlink" title="服务(Services)"></a>服务(Services)</h2><p>当我们在分析某一领域时，一直在尝试如何将信息转化为领域模型，但并非所有的点我们都能用Model来涵盖。对象应当有属性，状态和行为，但有时领域中有一些行为是无法映射到具体的对象中的，我们也不能强行将其放入在某一个模型对象中，而将其单独作为一个方法又没有地方，此时就需要服务</p>
 <h2 id="工厂-Factories"><a href="#工厂-Factories" class="headerlink" title="工厂(Factories)"></a>工厂(Factories)</h2><p>在大型系统中，实体和聚合通常是很复杂的，这就导致了很难去通过构造器来创建对象。工厂就决解了这个问题，它把创建对象的细节封装起来，巧妙的实现了依赖反转。当然对聚合也适用（当建立了聚合根时，其他对象可以自动创建）</p>
 <h2 id="仓库-Repository"><a href="#仓库-Repository" class="headerlink" title="仓库(Repository)"></a>仓库(Repository)</h2><p>仓库封装了获取对象的逻辑，领域对象无须和底层数据库交互，它只需要从仓库中获取对象即可。仓库可以存储对象的引用，当一个对象被创建后，它可能会被存储到仓库中，那么下次就可以从仓库取。如果用户请求的数据没在仓库中，则会从数据库里取，这就减少了底层交互的次数</p>
@@ -99,9 +99,9 @@
 <li>事件是一等公民，系统的基础数据是事件，事件需要被储存在数据库中</li>
 <li>业务数据只是由事件产生的视图，不一定需要存储在数据库</li>
 </ul>
-<p>这里展示的例子是一个银行账户经历的几个事件：创建 -&gt; 存款300 -&gt; 存款100 -&gt; 取出200<br><img src="/2019/08/11/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" alt="Event Souring"></p>
-<p>在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可<br><img src="/2019/08/11/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" alt="Event Souring"></p>
-<h1 id="CQRS-命令查询责任分离"><a href="#CQRS-命令查询责任分离" class="headerlink" title="CQRS(命令查询责任分离)"></a>CQRS(命令查询责任分离)</h1><p>CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及<br><img src="/2019/08/11/DDD/CQRS.jpg" alt="CQRS + Event Souring"></p>
+<p>这里展示的例子是一个银行账户经历的几个事件：创建 -&gt; 存款300 -&gt; 存款100 -&gt; 取出200<br><img src="/2019/08/11/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
+<p>在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可<br><img src="/2019/08/11/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
+<h1 id="CQRS-命令查询责任分离"><a href="#CQRS-命令查询责任分离" class="headerlink" title="CQRS(命令查询责任分离)"></a>CQRS(命令查询责任分离)</h1><p>CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及<br><img src="/2019/08/11/DDD/CQRS.jpg" srcset="/img/loading.gif" alt="CQRS + Event Souring"></p>
 <p>参考资料：</p>
 <ul>
 <li>《领域驱动设计：软件核心复杂性应对之道》  </li>
@@ -243,6 +243,23 @@ rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</s
       </tags>
   </entry>
   <entry>
+    <title>Test</title>
+    <url>/2017/04/20/Demo/</url>
+    <content><![CDATA[<p>test test！！</p>
+<a id="more"></a>
+<h2 id="ACG"><a href="#ACG" class="headerlink" title="ACG"></a>ACG</h2><h3 id="格子裙赛高！"><a href="#格子裙赛高！" class="headerlink" title="格子裙赛高！"></a>格子裙赛高！</h3><p><img src="/2017/04/20/Demo/COLORS_47646872_p0.jpg" srcset="/img/loading.gif" alt="123"> </p>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872" target="_blank" rel="noopener">カントク - COLORS(id=47646872)</a></p>
+]]></content>
+      <categories>
+        <category>ACG</category>
+      </categories>
+      <tags>
+        <tag>监督</tag>
+        <tag>格子裙</tag>
+        <tag>放学五年目</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2017/03/20/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
@@ -266,20 +283,110 @@ rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</s
       </tags>
   </entry>
   <entry>
-    <title>Test</title>
-    <url>/2017/04/20/Demo/</url>
-    <content><![CDATA[<p>test test！！</p>
+    <title>Reactor中的上下文</title>
+    <url>/2020/09/08/context-of-reactor/</url>
+    <content><![CDATA[<p>由于参与的项目当中决定用 <a href="https://github.com/spring-cloud/spring-cloud-gateway" target="_blank" rel="noopener">spring-cloud-gateway</a> 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    </p>
+<p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
 <a id="more"></a>
-<h2 id="ACG"><a href="#ACG" class="headerlink" title="ACG"></a>ACG</h2><h3 id="格子裙赛高！"><a href="#格子裙赛高！" class="headerlink" title="格子裙赛高！"></a>格子裙赛高！</h3><p><img src="/2017/04/20/Demo/COLORS_47646872_p0.jpg" alt="123"> </p>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872" target="_blank" rel="noopener">カントク - COLORS(id=47646872)</a></p>
-]]></content>
+
+<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><div class="hljs"><pre><code>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。  
+但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 THreadLocal 自然也就失去上下文储存对象的能力。
+
+经过简单的谷歌查询，我只能想两种处理方法：
+    1. 从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。
+    2. 直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。
+但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然添加国际化的变量。</code></pre></div><h2 id="How-can-I-do"><a href="#How-can-I-do" class="headerlink" title="How can I do"></a>How can I do</h2><div class="hljs"><pre><code>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是`ReactiveSecurityContextHolder`，对应 Servlet 当中的`SecurityContextHolder`。
+
+ReactiveSecurityContextHolder#getContext
+<pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
+
+<span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
+		<span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
+			.<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
+			.flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
+&#125;</code></pre></code></pre></div>
+
+可以看到，通过`Mono.subscriberContext()`，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。  
+这里需要注意，如果直接获取值会抛出异常。  
+
+那么它又是如何赋值的呢？  
+当我查看`withSecurityContext`方法时，其注释告诉我时用来创建一个包含`SecurityContext`的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  
+所以当我们查看有什么方法调用它时，就会发现`ReactorContextWebFilter`这个过滤器。
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+	<span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
+
+	<span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
+		Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
+		<span class="hljs-keyword">this</span>.repository = repository;
+	&#125;
+
+	<span class="hljs-meta">@Override</span>
+	<span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+		<span class="hljs-keyword">return</span> chain.filter(exchange)
+			.subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+				<span class="hljs-type">withSecurityContext</span></span>(c, exchange)
+			);
+	&#125;
+
+	<span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
+		<span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
+			.<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
+	&#125;
+&#125;</code></pre></div>
+
+ServerSecurityContextRepository#load
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
+    <span class="hljs-keyword">return</span> exchange.getSession()
+        .map(WebSession::getAttributes)
+        .flatMap( attrs -&gt; &#123;
+            SecurityContext context = (SecurityContext) attrs.<span class="hljs-keyword">get</span>(<span class="hljs-keyword">this</span>.springSecurityContextAttrName);
+            <span class="hljs-keyword">return</span> Mono.justOrEmpty(context);
+        &#125;);
+&#125;</code></pre></div>
+
+ReactiveSecurityContextHolder#withSecurityContext
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
+&#125;</code></pre></div>
+
+通过阅读上面的代码可得知，上面的过滤器通过`ServerSecurityContextRepository`解析请求中的 Security 上下文，通过`ReactiveSecurityContextHolder`生成 Securtiy 上下文对象并返回。
+
+由此我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withLocaleContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withLocaleContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-comment">//解析请求获取 Locale </span>
+        Locale locale = getLocale(exchcange);
+        <span class="hljs-keyword">return</span> mainContext.putAll(Context.of(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-type">Mono.justOrEmpty</span></span>(locale)));
+    &#125;
+&#125;
+
+<span class="hljs-comment">//获取 Locale</span>
+Mono.subscriberContext()
+            .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
+            .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
+
+
+
+具体实现我日后会写一个demo。]]></content>
       <categories>
-        <category>ACG</category>
+        <category>Java</category>
+        <category>Reactor</category>
       </categories>
       <tags>
-        <tag>监督</tag>
-        <tag>格子裙</tag>
-        <tag>放学五年目</tag>
+        <tag>Java</tag>
+        <tag>Reactor</tag>
+        <tag>Webflux</tag>
+        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
@@ -426,10 +533,13 @@ main
 ]]></content>
       <categories>
         <category>Java</category>
+        <category>Reactor</category>
       </categories>
       <tags>
         <tag>Java</tag>
         <tag>Reactor</tag>
+        <tag>Webflux</tag>
+        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
