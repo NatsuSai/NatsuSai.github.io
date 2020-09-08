@@ -172,7 +172,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      910 字
+      912 字
     </span>
   
 
@@ -216,7 +216,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：几秒前
+                  本文最后更新于：20 分钟前
                 
               </p>
             
@@ -225,52 +225,49 @@
 <p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
 <a id="more"></a>
 
-<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><div class="hljs"><pre><code>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。  
-但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 THreadLocal 自然也就失去上下文储存对象的能力。
-
-经过简单的谷歌查询，我只能想两种处理方法：
-    1. 从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。
-    2. 直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。
-但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然添加国际化的变量。</code></pre></div><h2 id="How-can-I-do"><a href="#How-can-I-do" class="headerlink" title="How can I do"></a>How can I do</h2><div class="hljs"><pre><code>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是`ReactiveSecurityContextHolder`，对应 Servlet 当中的`SecurityContextHolder`。
-
-ReactiveSecurityContextHolder#getContext
+<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><p>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。<br>但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 THreadLocal 自然也就失去上下文储存对象的能力。</p>
+<p>经过简单的谷歌查询，我只能想两种处理方法：  </p>
+<ol>
+<li>从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。</li>
+<li>直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。</li>
+</ol>
+<p>但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然添加国际化的变量。</p>
+<h2 id="How-can-I-do"><a href="#How-can-I-do" class="headerlink" title="How can I do"></a>How can I do</h2><h3 id="如何取值？"><a href="#如何取值？" class="headerlink" title="如何取值？"></a>如何取值？</h3><p>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是<code>ReactiveSecurityContextHolder</code>，对应 Servlet 当中的<code>SecurityContextHolder</code>。</p>
+<p>ReactiveSecurityContextHolder#getContext</p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
 
 <span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
-		<span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
-			.<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
-			.flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
-&#125;</code></pre></div></code></pre></div>
-
-可以看到，通过`Mono.subscriberContext()`，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。  
-这里需要注意，如果直接获取值会抛出异常。  
-
-那么它又是如何赋值的呢？  
-当我查看`withSecurityContext`方法时，其注释告诉我时用来创建一个包含`SecurityContext`的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  
-所以当我们查看有什么方法调用它时，就会发现`ReactorContextWebFilter`这个过滤器。
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
-	<span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
-
-	<span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
-		Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
-		<span class="hljs-keyword">this</span>.repository = repository;
-	&#125;
-
-	<span class="hljs-meta">@Override</span>
-	<span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
-		<span class="hljs-keyword">return</span> chain.filter(exchange)
-			.subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
-				<span class="hljs-type">withSecurityContext</span></span>(c, exchange)
-			);
-	&#125;
-
-	<span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
-		<span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
-			.<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
-	&#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
+            .<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
+            .flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
 &#125;</code></pre></div>
 
-ServerSecurityContextRepository#load
+<p>可以看到，通过<code>Mono.subscriberContext()</code>，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。<br>这里需要注意，如果直接获取值会抛出异常。   </p>
+<h3 id="那么它又是如何赋值的呢？"><a href="#那么它又是如何赋值的呢？" class="headerlink" title="那么它又是如何赋值的呢？"></a>那么它又是如何赋值的呢？</h3><p>当我查看<code>withSecurityContext</code>方法时，其注释告诉我时用来创建一个包含<code>SecurityContext</code>的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  </p>
+<p>所以当我们查看有什么方法调用它时，就会发现<code>ReactorContextWebFilter</code>这个过滤器。</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
+
+    <span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
+        Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
+        <span class="hljs-keyword">this</span>.repository = repository;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withSecurityContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
+            .<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
+    &#125;
+&#125;</code></pre></div>
+
+<p>ServerSecurityContextRepository#load</p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
     <span class="hljs-keyword">return</span> exchange.getSession()
         .map(WebSession::getAttributes)
@@ -280,14 +277,13 @@ ServerSecurityContextRepository#load
         &#125;);
 &#125;</code></pre></div>
 
-ReactiveSecurityContextHolder#withSecurityContext
+<p>ReactiveSecurityContextHolder#withSecurityContext</p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
     <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
 &#125;</code></pre></div>
 
-通过阅读上面的代码可得知，上面的过滤器通过`ServerSecurityContextRepository`解析请求中的 Security 上下文，通过`ReactiveSecurityContextHolder`生成 Securtiy 上下文对象并返回。
-
-由此我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  
+<p>通过阅读上面的代码可得知，上面的过滤器通过<code>ServerSecurityContextRepository</code>解析请求中的 Security 上下文，通过<code>ReactiveSecurityContextHolder</code>生成 Securtiy 上下文对象并返回。</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  </p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
 <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
     
@@ -311,9 +307,8 @@ Mono.subscriberContext()
             .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
             .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
 
+<p>具体实现我日后会写一个demo。</p>
 
-
-具体实现我日后会写一个demo。
             </div>
             <hr>
             <div>
