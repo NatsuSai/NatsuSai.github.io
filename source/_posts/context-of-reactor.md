@@ -28,8 +28,8 @@ thumbnail: /gallery/machi.png
     
 但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然添加国际化的变量。
 
-## How can I do
-### 如何取值？
+## How should I do
+### 如何取值
 令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是`ReactiveSecurityContextHolder`，对应 Servlet 当中的`SecurityContextHolder`。
 
 ReactiveSecurityContextHolder#getContext
@@ -46,8 +46,8 @@ public static Mono<SecurityContext> getContext() {
 这里需要注意，如果直接获取值会抛出异常。   
 
 
-### 那么它又是如何赋值的呢？    
-当我查看`withSecurityContext`方法时，其注释告诉我时用来创建一个包含`SecurityContext`的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  
+### 如何赋值    
+当我查看`withSecurityContext`方法时，其注释告诉我是用来创建一个包含`SecurityContext`的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  
 
 所以当我们查看有什么方法调用它时，就会发现`ReactorContextWebFilter`这个过滤器。
 ```
@@ -92,7 +92,7 @@ public static Context withSecurityContext(Mono<? extends SecurityContext> securi
 ```
 通过阅读上面的代码可得知，上面的过滤器通过`ServerSecurityContextRepository`解析请求中的 Security 上下文，通过`ReactiveSecurityContextHolder`生成 Securtiy 上下文对象并返回。
 
-### 实现
+## Finally
 我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  
 ```
 // 将 Locale 放到上下文中
