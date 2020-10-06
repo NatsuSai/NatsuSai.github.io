@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://www.kurenai.club/2020/10/06/learning-jpa-01/</loc>
+    <loc>https://www.kurenai.club/2020/10/06/learning-jpa-02/</loc>
     
     <lastmod>2020-10-06</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/2020/10/06/learning-jpa-02/</loc>
+    <loc>https://www.kurenai.club/2020/10/06/learning-jpa-01/</loc>
     
     <lastmod>2020-10-06</lastmod>
     
@@ -102,42 +102,21 @@
 
   
   <url>
-    <loc>https://www.kurenai.club/tags/%E7%9B%91%E7%9D%A3/</loc>
+    <loc>https://www.kurenai.club/tags/Nginx/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/%E6%A0%BC%E5%AD%90%E8%A3%99/</loc>
+    <loc>https://www.kurenai.club/tags/%E8%BD%AC%E8%BD%BD/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/%E6%94%BE%E5%AD%A6%E4%BA%94%E5%B9%B4%E7%9B%AE/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/tags/DDD/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/tags/CQRS/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/tags/Event-Sourcing/</loc>
+    <loc>https://www.kurenai.club/tags/tags/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -193,21 +172,42 @@
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/Nginx/</loc>
+    <loc>https://www.kurenai.club/tags/%E7%9B%91%E7%9D%A3/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/%E8%BD%AC%E8%BD%BD/</loc>
+    <loc>https://www.kurenai.club/tags/%E6%A0%BC%E5%AD%90%E8%A3%99/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/tags/</loc>
+    <loc>https://www.kurenai.club/tags/%E6%94%BE%E5%AD%A6%E4%BA%94%E5%B9%B4%E7%9B%AE/</loc>
+    <lastmod>2020-10-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/tags/DDD/</loc>
+    <lastmod>2020-10-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/tags/CQRS/</loc>
+    <lastmod>2020-10-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/tags/Event-Sourcing/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -251,7 +251,7 @@
 
   
   <url>
-    <loc>https://www.kurenai.club/categories/ACG/</loc>
+    <loc>https://www.kurenai.club/categories/Nginx/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -265,7 +265,7 @@
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/categories/Nginx/</loc>
+    <loc>https://www.kurenai.club/categories/ACG/</loc>
     <lastmod>2020-10-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
