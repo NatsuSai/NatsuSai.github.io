@@ -18,6 +18,108 @@
       </tags>
   </entry>
   <entry>
+    <title>Reactor中的上下文</title>
+    <url>/2020/09/08/context-of-reactor/</url>
+    <content><![CDATA[<p>由于参与的项目当中决定用 <a href="https://github.com/spring-cloud/spring-cloud-gateway" target="_blank" rel="noopener">spring-cloud-gateway</a> 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    </p>
+<p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
+<a id="more"></a>
+
+<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><p>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。<br>但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 ThreadLocal 自然也就失去上下文储存对象的能力。</p>
+<p>经过简单的谷歌查询，我只能想两种处理方法：  </p>
+<ol>
+<li>从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。</li>
+<li>直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。</li>
+</ol>
+<p>但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然就无法添加国际化的变量。</p>
+<h2 id="How-should-I-do"><a href="#How-should-I-do" class="headerlink" title="How should I do"></a>How should I do</h2><h3 id="如何取值"><a href="#如何取值" class="headerlink" title="如何取值"></a>如何取值</h3><p>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是<code>ReactiveSecurityContextHolder</code>，对应 Servlet 当中的<code>SecurityContextHolder</code>。</p>
+<p>ReactiveSecurityContextHolder#getContext</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
+
+<span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
+            .<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
+            .flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
+&#125;</code></pre></div>
+
+<p>可以看到，通过<code>Mono.subscriberContext()</code>，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。<br>这里需要注意，如果直接获取值会抛出异常。   </p>
+<h3 id="如何赋值"><a href="#如何赋值" class="headerlink" title="如何赋值"></a>如何赋值</h3><p>当我查看<code>withSecurityContext</code>方法时，其注释告诉我是用来创建一个包含<code>SecurityContext</code>的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  </p>
+<p>所以当我们查看有什么方法调用它时，就会发现<code>ReactorContextWebFilter</code>这个过滤器。</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
+
+    <span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
+        Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
+        <span class="hljs-keyword">this</span>.repository = repository;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withSecurityContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
+            .<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
+    &#125;
+&#125;</code></pre></div>
+
+<p>ServerSecurityContextRepository#load</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
+    <span class="hljs-keyword">return</span> exchange.getSession()
+        .map(WebSession::getAttributes)
+        .flatMap( attrs -&gt; &#123;
+            SecurityContext context = (SecurityContext) attrs.<span class="hljs-keyword">get</span>(<span class="hljs-keyword">this</span>.springSecurityContextAttrName);
+            <span class="hljs-keyword">return</span> Mono.justOrEmpty(context);
+        &#125;);
+&#125;</code></pre></div>
+
+<p>ReactiveSecurityContextHolder#withSecurityContext</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
+&#125;</code></pre></div>
+
+<p>通过阅读上面的代码可得知，上面的过滤器通过<code>ServerSecurityContextRepository</code>解析请求中的 Security 上下文，通过<code>ReactiveSecurityContextHolder</code>生成 Securtiy 上下文对象并返回。</p>
+<h2 id="Finally"><a href="#Finally" class="headerlink" title="Finally"></a>Finally</h2><p>我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  </p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withLocaleContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withLocaleContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-comment">//解析请求获取 Locale </span>
+        Locale locale = getLocale(exchcange);
+        <span class="hljs-keyword">return</span> mainContext.putAll(Context.of(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-type">Mono.justOrEmpty</span></span>(locale)));
+    &#125;
+&#125;
+
+<span class="hljs-comment">//获取 Locale</span>
+Mono.subscriberContext()
+            .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
+            .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
+
+<p>具体实现我日后会写一个demo。<del>咕咕咕</del></p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Reactor</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Reactor</tag>
+        <tag>Webflux</tag>
+        <tag>Spring</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Re：从零开始的领域驱动设计</title>
     <url>/2019/08/11/DDD/</url>
     <content><![CDATA[<p>领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。</p>
@@ -133,10 +235,10 @@
         <category>Java</category>
       </categories>
       <tags>
+        <tag>Java</tag>
         <tag>DDD</tag>
         <tag>CQRS</tag>
         <tag>Event Sourcing</tag>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -283,95 +385,146 @@ rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</s
       </tags>
   </entry>
   <entry>
-    <title>Reactor中的上下文</title>
-    <url>/2020/09/08/context-of-reactor/</url>
-    <content><![CDATA[<p>由于参与的项目当中决定用 <a href="https://github.com/spring-cloud/spring-cloud-gateway" target="_blank" rel="noopener">spring-cloud-gateway</a> 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    </p>
-<p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
+    <title>Reactor处理阻塞问题笔记</title>
+    <url>/2020/03/03/lean-pulishOn-of-reactor/</url>
+    <content><![CDATA[<p>其实本来想要记录问题的过程，但奈何自己也说不太好XD</p>
 <a id="more"></a>
+<h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>由于接触Vert.x以及阅读其文档后，了解到异步编程下是不能够阻塞主线程的，不然异步将失去意义。</p>
+<p>我们需要做的是将这些阻塞线程移到其他线程进行处理。</p>
+<h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><p>利用Mono或是Flux的PublishOn方法将之后调用的方法都移动到其他线程进行处理。</p>
+<ul>
+<li><p><code>publishOn</code></p>
+<div class="hljs"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Mono&lt;T&gt; <span class="hljs-title">publishOn</span><span class="hljs-params">(Scheduler scheduler)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Flux&lt;T&gt; <span class="hljs-title">publishOn</span><span class="hljs-params">(Scheduler scheduler)</span></span>;</code></pre></div>
 
-<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><p>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。<br>但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 ThreadLocal 自然也就失去上下文储存对象的能力。</p>
-<p>经过简单的谷歌查询，我只能想两种处理方法：  </p>
-<ol>
-<li>从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。</li>
-<li>直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。</li>
-</ol>
-<p>但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然就无法添加国际化的变量。</p>
-<h2 id="How-should-I-do"><a href="#How-should-I-do" class="headerlink" title="How should I do"></a>How should I do</h2><h3 id="如何取值"><a href="#如何取值" class="headerlink" title="如何取值"></a>如何取值</h3><p>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是<code>ReactiveSecurityContextHolder</code>，对应 Servlet 当中的<code>SecurityContextHolder</code>。</p>
-<p>ReactiveSecurityContextHolder#getContext</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
+<p>其中<code>Scheduler</code>可用<code>Schedulers.parallel()</code>或<code>Schedulers.single()</code>进项创建或是其他方法，其中<code>single</code>和<code>parallel</code>是有一些区别的。</p>
+<ul>
+<li><p><code>single</code></p>
+<p>这一条调用链下不会同时执行，并且只有这条调用链执行完成后才会再次被调用</p>
+</li>
+<li><p><code>parallel</code></p>
+<p>与上面相反，调用链会在同时执行</p>
+</li>
+</ul>
+<p>下面是测试代码</p>
+<p><del>本人只是刚开始玩reactor，程序写的很蹩脚XD</del></p>
+<div class="hljs"><pre><code class="hljs java"><span class="hljs-meta">@Test</span>
+  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;
+    AtomicReference&lt;Employee&gt; employeeAR = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(); <span class="hljs-comment">//&lt;1&gt;</span>
+    Scheduler scheduler = Schedulers.single(); <span class="hljs-comment">//&lt;2&gt;</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) &#123;
+      <span class="hljs-keyword">int</span> finalI = i;
+      Mono.just(<span class="hljs-number">1</span>)
+          .publishOn(scheduler)
+          .map(x -&gt; &#123;
+            <span class="hljs-keyword">try</span> &#123;
+              Thread.sleep(<span class="hljs-number">1000</span>);
+              System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
+                  .getName() + <span class="hljs-string">"-A"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
+            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;
+              e.printStackTrace();
+            &#125;
+            Employee emp = buildEmployee();
+            employeeAR.set(emp); <span class="hljs-comment">//&lt;1&gt;</span>
+            <span class="hljs-keyword">return</span> emp;
+          &#125;)
+          .map(x -&gt; &#123;
+            <span class="hljs-keyword">try</span> &#123;
+              System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
+                  .getName() + <span class="hljs-string">"-B"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
+              Thread.sleep(<span class="hljs-number">1000</span>);
+            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;
+              e.printStackTrace();
+            &#125;
+            <span class="hljs-keyword">return</span> x;
+          &#125;)
+          .map(x -&gt; &#123;
+            System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
+                .getName() + <span class="hljs-string">"-C"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
+            <span class="hljs-keyword">return</span> employeeAR.get().getAccountId(); <span class="hljs-comment">//&lt;1&gt;</span>
+          &#125;)
+          .subscribe(System.out::println);
 
-<span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
-            .<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
-            .flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
-&#125;</code></pre></div>
-
-<p>可以看到，通过<code>Mono.subscriberContext()</code>，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。<br>这里需要注意，如果直接获取值会抛出异常。   </p>
-<h3 id="如何赋值"><a href="#如何赋值" class="headerlink" title="如何赋值"></a>如何赋值</h3><p>当我查看<code>withSecurityContext</code>方法时，其注释告诉我是用来创建一个包含<code>SecurityContext</code>的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  </p>
-<p>所以当我们查看有什么方法调用它时，就会发现<code>ReactorContextWebFilter</code>这个过滤器。</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
-
-    <span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
-        Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
-        <span class="hljs-keyword">this</span>.repository = repository;
+      System.out.println(Thread.currentThread()
+          .getName());  <span class="hljs-comment">//&lt;3&gt;</span>
     &#125;
+    <span class="hljs-keyword">char</span> c = (<span class="hljs-keyword">char</span>) System.in.read();
+    System.out.println(<span class="hljs-string">"your char is: "</span> + c);
+  &#125;</code></pre></div>
 
-    <span class="hljs-meta">@Override</span>
-    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
-        <span class="hljs-keyword">return</span> chain.filter(exchange)
-            .subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
-                <span class="hljs-type">withSecurityContext</span></span>(c, exchange)
-            );
-    &#125;
+<ul>
+<li>&lt;1&gt; 因为涉及到匿名方法中的变量的再次调用，所以用到AtomicReference进行储存。</li>
+</ul>
+<p>下面是<code>single</code>的运行结果</p>
+<div class="hljs"><pre><code class="hljs undefined">main
+main
+main
+main
+main
+<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-A
+<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-B
+<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-C
+<span class="hljs-number">123</span>
+<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-A
+<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-B
+<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-C
+<span class="hljs-number">123</span>
+<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-A
+<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-B
+<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-C
+<span class="hljs-number">123</span>
+<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-A
+<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-B
+<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-C
+<span class="hljs-number">123</span>
+<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-A
+<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-B
+<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-C
+<span class="hljs-number">123</span></code></pre></div>
 
-    <span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
-        <span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
-            .<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
-    &#125;
-&#125;</code></pre></div>
+<p>将&lt;2&gt;中<code>single</code>改为<code>parallel</code></p>
+<div class="hljs"><pre><code class="hljs undefined">main
+main
+main
+main
+main
+<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-A
+<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-A
+<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-A
+<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-A
+<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-B
+<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-B
+<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-B
+<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-A
+<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-B
+<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-B
+<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-C
+<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-C
+<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-C
+<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-C
+<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-C
+<span class="hljs-number">123</span>
+<span class="hljs-number">123</span>
+<span class="hljs-number">123</span>
+<span class="hljs-number">123</span>
+<span class="hljs-number">123</span></code></pre></div>
 
-<p>ServerSecurityContextRepository#load</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
-    <span class="hljs-keyword">return</span> exchange.getSession()
-        .map(WebSession::getAttributes)
-        .flatMap( attrs -&gt; &#123;
-            SecurityContext context = (SecurityContext) attrs.<span class="hljs-keyword">get</span>(<span class="hljs-keyword">this</span>.springSecurityContextAttrName);
-            <span class="hljs-keyword">return</span> Mono.justOrEmpty(context);
-        &#125;);
-&#125;</code></pre></div>
-
-<p>ReactiveSecurityContextHolder#withSecurityContext</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
-&#125;</code></pre></div>
-
-<p>通过阅读上面的代码可得知，上面的过滤器通过<code>ServerSecurityContextRepository</code>解析请求中的 Security 上下文，通过<code>ReactiveSecurityContextHolder</code>生成 Securtiy 上下文对象并返回。</p>
-<h2 id="Finally"><a href="#Finally" class="headerlink" title="Finally"></a>Finally</h2><p>我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  </p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
-    
-    <span class="hljs-meta">@Override</span>
-    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
-        <span class="hljs-keyword">return</span> chain.filter(exchange)
-            .subscriberContext(c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
-                <span class="hljs-type">withLocaleContext</span></span>(c, exchange)
-            );
-    &#125;
-
-    <span class="hljs-keyword">private</span> Context withLocaleContext(Context mainContext, ServerWebExchange exchange) &#123;
-        <span class="hljs-comment">//解析请求获取 Locale </span>
-        Locale locale = getLocale(exchcange);
-        <span class="hljs-keyword">return</span> mainContext.putAll(Context.of(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-type">Mono.justOrEmpty</span></span>(locale)));
-    &#125;
-&#125;
-
-<span class="hljs-comment">//获取 Locale</span>
-Mono.subscriberContext()
-            .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
-            .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
-
-<p>具体实现我日后会写一个demo。<del>咕咕咕</del></p>
+<p>观察代码中&lt;3&gt;，我们可以发现调用链当中是按照顺序执行的（我最开始以为会平行执行调用链中的方法，但并不是），而且主线程也没有被阻塞，能够快速输出当前线程名称，由此可见已经达到我们最初的目的了——不阻塞主线程。</p>
+</li>
+</ul>
+<h2 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h2><p>在这里我用的是Spring WebFlux，而其中会用到netty，其中有一个Eventloop模块，这是由单个线程运行的模块，这个单线程就是由我们程序所运行的主线程来担当。</p>
+<p>Eventloop会重复检查当前有没有事件产生，若有则会接收该事件并运行相应的事件响应，也就是发布订阅模式，而如果我们在其中一个调用该事件的响应方法中等待（阻塞）过久，就会导致我们无法快速处理后续产生的事件，只能够加多线程进行快速处理，这就又回到了非异步编程当中去了。</p>
+<p>所以能够快速响应才能够体现出异步编程的优势。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://github.com/reactor/reactor-core/issues/1756" target="_blank" rel="noopener">Is there a standard way to solve blocking that must happen.</a></li>
+<li><a href="https://stackoverflow.com/questions/56706308/how-to-handle-blocking-calls-when-using-reactor-in-a-jax-rs-powered-server" target="_blank" rel="noopener">How to handle blocking calls when using reactor in a JAX-RS-powered server?</a></li>
+</ul>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
+<li><input disabled type="checkbox"> 测试嵌套调用publishiOn是什么情况  </li>
+<li><input disabled type="checkbox"> 是否是调用一次publishOn后，后面的链式调用都是在另一条线程，是否需要再次调用一次pubulishOn保证之后的一次阻塞操作也不在主线程当中  </li>
+<li><input disabled type="checkbox"> 补充详细Evenloop  </li>
+<li><input disabled type="checkbox"> 寻找更加优雅的方式，或者看看这种链式调用是不是也是一个不太好的地方  </li>
+</ul>
 ]]></content>
       <categories>
         <category>Java</category>
@@ -545,182 +698,29 @@ Mono.subscriberContext()
       </tags>
   </entry>
   <entry>
-    <title>Reactor处理阻塞问题笔记</title>
-    <url>/2020/03/03/lean-pulishOn-of-reactor/</url>
-    <content><![CDATA[<p>其实本来想要记录问题的过程，但奈何自己也说不太好XD</p>
-<a id="more"></a>
-<h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>由于接触Vert.x以及阅读其文档后，了解到异步编程下是不能够阻塞主线程的，不然异步将失去意义。</p>
-<p>我们需要做的是将这些阻塞线程移到其他线程进行处理。</p>
-<h2 id="How"><a href="#How" class="headerlink" title="How"></a>How</h2><p>利用Mono或是Flux的PublishOn方法将之后调用的方法都移动到其他线程进行处理。</p>
-<ul>
-<li><p><code>publishOn</code></p>
-<div class="hljs"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Mono&lt;T&gt; <span class="hljs-title">publishOn</span><span class="hljs-params">(Scheduler scheduler)</span></span>;
-<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Flux&lt;T&gt; <span class="hljs-title">publishOn</span><span class="hljs-params">(Scheduler scheduler)</span></span>;</code></pre></div>
-
-<p>其中<code>Scheduler</code>可用<code>Schedulers.parallel()</code>或<code>Schedulers.single()</code>进项创建或是其他方法，其中<code>single</code>和<code>parallel</code>是有一些区别的。</p>
-<ul>
-<li><p><code>single</code></p>
-<p>这一条调用链下不会同时执行，并且只有这条调用链执行完成后才会再次被调用</p>
-</li>
-<li><p><code>parallel</code></p>
-<p>与上面相反，调用链会在同时执行</p>
-</li>
-</ul>
-<p>下面是测试代码</p>
-<p><del>本人只是刚开始玩reactor，程序写的很蹩脚XD</del></p>
-<div class="hljs"><pre><code class="hljs java"><span class="hljs-meta">@Test</span>
-  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;
-    AtomicReference&lt;Employee&gt; employeeAR = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(); <span class="hljs-comment">//&lt;1&gt;</span>
-    Scheduler scheduler = Schedulers.single(); <span class="hljs-comment">//&lt;2&gt;</span>
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++) &#123;
-      <span class="hljs-keyword">int</span> finalI = i;
-      Mono.just(<span class="hljs-number">1</span>)
-          .publishOn(scheduler)
-          .map(x -&gt; &#123;
-            <span class="hljs-keyword">try</span> &#123;
-              Thread.sleep(<span class="hljs-number">1000</span>);
-              System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
-                  .getName() + <span class="hljs-string">"-A"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
-            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;
-              e.printStackTrace();
-            &#125;
-            Employee emp = buildEmployee();
-            employeeAR.set(emp); <span class="hljs-comment">//&lt;1&gt;</span>
-            <span class="hljs-keyword">return</span> emp;
-          &#125;)
-          .map(x -&gt; &#123;
-            <span class="hljs-keyword">try</span> &#123;
-              System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
-                  .getName() + <span class="hljs-string">"-B"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
-              Thread.sleep(<span class="hljs-number">1000</span>);
-            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;
-              e.printStackTrace();
-            &#125;
-            <span class="hljs-keyword">return</span> x;
-          &#125;)
-          .map(x -&gt; &#123;
-            System.out.println(finalI + <span class="hljs-string">"-"</span> + Thread.currentThread()
-                .getName() + <span class="hljs-string">"-C"</span>); <span class="hljs-comment">//&lt;3&gt;</span>
-            <span class="hljs-keyword">return</span> employeeAR.get().getAccountId(); <span class="hljs-comment">//&lt;1&gt;</span>
-          &#125;)
-          .subscribe(System.out::println);
-
-      System.out.println(Thread.currentThread()
-          .getName());  <span class="hljs-comment">//&lt;3&gt;</span>
-    &#125;
-    <span class="hljs-keyword">char</span> c = (<span class="hljs-keyword">char</span>) System.in.read();
-    System.out.println(<span class="hljs-string">"your char is: "</span> + c);
-  &#125;</code></pre></div>
-
-<ul>
-<li>&lt;1&gt; 因为涉及到匿名方法中的变量的再次调用，所以用到AtomicReference进行储存。</li>
-</ul>
-<p>下面是<code>single</code>的运行结果</p>
-<div class="hljs"><pre><code class="hljs undefined">main
-main
-main
-main
-main
-<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-A
-<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-B
-<span class="hljs-number">0</span>-single<span class="hljs-number">-1</span>-C
-<span class="hljs-number">123</span>
-<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-A
-<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-B
-<span class="hljs-number">1</span>-single<span class="hljs-number">-1</span>-C
-<span class="hljs-number">123</span>
-<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-A
-<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-B
-<span class="hljs-number">2</span>-single<span class="hljs-number">-1</span>-C
-<span class="hljs-number">123</span>
-<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-A
-<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-B
-<span class="hljs-number">3</span>-single<span class="hljs-number">-1</span>-C
-<span class="hljs-number">123</span>
-<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-A
-<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-B
-<span class="hljs-number">4</span>-single<span class="hljs-number">-1</span>-C
-<span class="hljs-number">123</span></code></pre></div>
-
-<p>将&lt;2&gt;中<code>single</code>改为<code>parallel</code></p>
-<div class="hljs"><pre><code class="hljs undefined">main
-main
-main
-main
-main
-<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-A
-<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-A
-<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-A
-<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-A
-<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-B
-<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-B
-<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-B
-<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-A
-<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-B
-<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-B
-<span class="hljs-number">0</span>-parallel<span class="hljs-number">-1</span>-C
-<span class="hljs-number">1</span>-parallel<span class="hljs-number">-2</span>-C
-<span class="hljs-number">3</span>-parallel<span class="hljs-number">-4</span>-C
-<span class="hljs-number">4</span>-parallel<span class="hljs-number">-5</span>-C
-<span class="hljs-number">2</span>-parallel<span class="hljs-number">-3</span>-C
-<span class="hljs-number">123</span>
-<span class="hljs-number">123</span>
-<span class="hljs-number">123</span>
-<span class="hljs-number">123</span>
-<span class="hljs-number">123</span></code></pre></div>
-
-<p>观察代码中&lt;3&gt;，我们可以发现调用链当中是按照顺序执行的（我最开始以为会平行执行调用链中的方法，但并不是），而且主线程也没有被阻塞，能够快速输出当前线程名称，由此可见已经达到我们最初的目的了——不阻塞主线程。</p>
-</li>
-</ul>
-<h2 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h2><p>在这里我用的是Spring WebFlux，而其中会用到netty，其中有一个Eventloop模块，这是由单个线程运行的模块，这个单线程就是由我们程序所运行的主线程来担当。</p>
-<p>Eventloop会重复检查当前有没有事件产生，若有则会接收该事件并运行相应的事件响应，也就是发布订阅模式，而如果我们在其中一个调用该事件的响应方法中等待（阻塞）过久，就会导致我们无法快速处理后续产生的事件，只能够加多线程进行快速处理，这就又回到了非异步编程当中去了。</p>
-<p>所以能够快速响应才能够体现出异步编程的优势。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
-<li><a href="https://github.com/reactor/reactor-core/issues/1756" target="_blank" rel="noopener">Is there a standard way to solve blocking that must happen.</a></li>
-<li><a href="https://stackoverflow.com/questions/56706308/how-to-handle-blocking-calls-when-using-reactor-in-a-jax-rs-powered-server" target="_blank" rel="noopener">How to handle blocking calls when using reactor in a JAX-RS-powered server?</a></li>
-</ul>
-<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
-<li><input disabled type="checkbox"> 测试嵌套调用publishiOn是什么情况  </li>
-<li><input disabled type="checkbox"> 是否是调用一次publishOn后，后面的链式调用都是在另一条线程，是否需要再次调用一次pubulishOn保证之后的一次阻塞操作也不在主线程当中  </li>
-<li><input disabled type="checkbox"> 补充详细Evenloop  </li>
-<li><input disabled type="checkbox"> 寻找更加优雅的方式，或者看看这种链式调用是不是也是一个不太好的地方  </li>
-</ul>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Reactor</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Reactor</tag>
-        <tag>Webflux</tag>
-        <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>学习JPA笔记——构建复杂查询</title>
     <url>/2020/10/06/learning-jpa-02/</url>
-    <content><![CDATA[<p>封面：同上篇，这次前景就是最高机密 Viper Zero。</p>
+    <content><![CDATA[<p>封面：同上篇，这次前景就是最高机密 Viper Zero。<del>嗯，没啥问题，每集一张，只是PS了</del></p>
 <a id="more"></a>
 <hr>
 <p>这里介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。 </p>
 <h2 id="SpringDataJPA"><a href="#SpringDataJPA" class="headerlink" title="SpringDataJPA"></a>SpringDataJPA</h2><p>SpringDataJPA 的复杂查询除了直接写 sql，按照规则定义 Repository 接口方法以外，还可以使用Specification做查询。</p>
 <h3 id="Specification"><a href="#Specification" class="headerlink" title="Specification"></a>Specification</h3><p>这是SpringDataJPA抽象出的一个接口，故并不一定通用于其他JPA的实现。<br>该接口重点在于<code>toPredicate</code>方法，该方法将创建一个 where 语句对象。</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Specification</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span> </span>&#123;
+<div class="hljs"><pre><code class="hljs undefined">public <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Specification</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span> </span>&#123;
 
     ...
 
-    <span class="hljs-comment">/**
-     * Creates a WHERE clause for a query of the referenced entity in form of a  Predicate for the given
-     * Root and CriteriaQuery.
-     */</span>
+    <span class="hljs-comment"><span class="markdown">/**
+<span class="hljs-bullet">     * </span>Creates </span>a<span class="markdown"> WHERE clause for </span>a<span class="markdown"> query of </span>the<span class="markdown"> referenced entity in form of </span>a<span class="markdown">  Predicate for </span>the<span class="markdown"> given
+<span class="hljs-bullet">     * </span>Root and CriteriaQuery.
+<span class="hljs-code">     */</span></span></span>
     <span class="hljs-meta">@Nullable</span>
-    <span class="hljs-function">Predicate <span class="hljs-title">toPredicate</span><span class="hljs-params">(Root&lt;T&gt; root, CriteriaQuery&lt;?&gt; query, CriteriaBuilder criteriaBuilder)</span></span>;
+    Predicate toPredicate(Root&lt;T&gt; root, CriteriaQuery&lt;?&gt; query, CriteriaBuilder criteriaBuilder);
 &#125;</code></pre></div>
 
 <p>这里我只做简要说明，以便于理解，仅供参考。</p>
 <ul>
-<li>root：<br>  一般指实体类本身，包装成 Root 对象, 可由query.from(Post.class)得到Root<post>，Java EE 会提到。</post></li>
+<li>root：<br>  一般指实体类本身，包装成 Root 对象, 可由query.from(Post.class)得到<code>Root&lt;Post&gt;</code>，Java EE 会提到。</li>
 <li>query：<br>  sql语句对象，一般在此方法内部不做调用，Java EE 会给一些用于理解的调用。</li>
 <li>criteriaBuilder：<br>  用于构建条件语句。</li>
 </ul>
