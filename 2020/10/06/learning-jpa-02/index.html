@@ -218,7 +218,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 分钟前
+                  本文最后更新于：3 分钟前
                 
               </p>
             
@@ -229,16 +229,16 @@
 <p>这里介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。 </p>
 <h2 id="SpringDataJPA"><a href="#SpringDataJPA" class="headerlink" title="SpringDataJPA"></a>SpringDataJPA</h2><p>SpringDataJPA 的复杂查询除了直接写 sql，按照规则定义 Repository 接口方法以外，还可以使用Specification做查询。</p>
 <h3 id="Specification"><a href="#Specification" class="headerlink" title="Specification"></a>Specification</h3><p>这是SpringDataJPA抽象出的一个接口，故并不一定通用于其他JPA的实现。<br>该接口重点在于<code>toPredicate</code>方法，该方法将创建一个 where 语句对象。</p>
-<div class="hljs"><pre><code class="hljs undefined">public <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Specification</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span> </span>&#123;
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Specification</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span> </span>&#123;
 
     ...
 
-    <span class="hljs-comment"><span class="markdown">/**
-<span class="hljs-bullet">     * </span>Creates </span>a<span class="markdown"> WHERE clause for </span>a<span class="markdown"> query of </span>the<span class="markdown"> referenced entity in form of </span>a<span class="markdown">  Predicate for </span>the<span class="markdown"> given
-<span class="hljs-bullet">     * </span>Root and CriteriaQuery.
-<span class="hljs-code">     */</span></span></span>
+    <span class="hljs-comment">/**
+     * Creates a WHERE clause for a query of the referenced entity in form of a  Predicate for the given
+     * Root and CriteriaQuery.
+     */</span>
     <span class="hljs-meta">@Nullable</span>
-    Predicate toPredicate(Root&lt;T&gt; root, CriteriaQuery&lt;?&gt; query, CriteriaBuilder criteriaBuilder);
+    <span class="hljs-function">Predicate <span class="hljs-title">toPredicate</span><span class="hljs-params">(Root&lt;T&gt; root, CriteriaQuery&lt;?&gt; query, CriteriaBuilder criteriaBuilder)</span></span>;
 &#125;</code></pre></div>
 
 <p>这里我只做简要说明，以便于理解，仅供参考。</p>
