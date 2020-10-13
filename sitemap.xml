@@ -95,7 +95,7 @@
 
   <url>
     <loc>https://www.kurenai.club/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -103,147 +103,147 @@
   
   <url>
     <loc>https://www.kurenai.club/tags/DDD/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/CQRS/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Event-Sourcing/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Java/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/tags/Nginx/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/tags/%E8%BD%AC%E8%BD%BD/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E7%9B%91%E7%9D%A3/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E6%A0%BC%E5%AD%90%E8%A3%99/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E6%94%BE%E5%AD%A6%E4%BA%94%E5%B9%B4%E7%9B%AE/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Reactor/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Webflux/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Spring/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://www.kurenai.club/tags/tags/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <loc>https://www.kurenai.club/tags/Nginx/</loc>
+    <lastmod>2020-10-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/tags/%E8%BD%AC%E8%BD%BD/</loc>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/ORM/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/JPA/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/Hibernate/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E4%B8%89%E7%A7%8B-%E7%BC%92/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E6%91%98%E6%8A%84/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/%E5%B0%8F%E8%AF%B4/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/tags/tags/</loc>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/docker/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/tags/ops/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -252,35 +252,35 @@
   
   <url>
     <loc>https://www.kurenai.club/categories/Java/</loc>
-    <lastmod>2020-10-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.kurenai.club/categories/Nginx/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/categories/ACG/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/categories/Java/Reactor/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.kurenai.club/categories/Nginx/</loc>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.kurenai.club/categories/docker/</loc>
-    <lastmod>2020-10-06</lastmod>
+    <lastmod>2020-10-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
