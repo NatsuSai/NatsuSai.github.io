@@ -66,7 +66,7 @@ color:  # 主题颜色配置，不一定能每一处都生效，可能会被局�
   post_text_color_dark: "#c4c6c9"
   post_heading_color: "#1a202c"     # 文章标题标签字体色（h1 h2 h3...）
   post_heading_color_dark: "#c4c6c9"
-  post_link_color: "#3c4858"        # 文章超链接字体色
+  post_link_color: "#4EA1D3"        # 文章超链接字体色
   post_link_color_dark: "#1589e9"
   link_hover_color: "#e85a71"       # 超链接悬浮时字体色
   link_hover_color_dark: "#30a9de"
