@@ -70,7 +70,7 @@ theme: fluid
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/NatsuSai/NatsuSai.github.io.git
+  repo: git@github.com:NatsuSai/NatsuSai.github.io.git
   branch: master
 
 # Avatar Ico
