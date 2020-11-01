@@ -218,7 +218,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：3 个月前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
@@ -238,14 +238,14 @@
 <p>当我们有了通用语言后，我们就能够在建立领域对象的时候听取专家的意见，同时能够让专家理解领域对象是否符合他们的预期  </p>
 <p>而形成通用语言是不容易的，因为其答案并不唯一，不同的人会有不同的理解，从而导致不同的答案。但我们可以试着从UML或是伪代码着手</p>
 <p><a href="http://note.youdao.com/noteshare?id=3834bfbae566164a48b0df825fc8134d&sub=B24036AF24534B79875E2C0B5D4C886F" target="_blank" rel="noopener">航运例子</a></p>
-<h1 id="层结构-Layered-Architecture"><a href="#层结构-Layered-Architecture" class="headerlink" title="层结构(Layered Architecture)"></a>层结构(Layered Architecture)</h1><p><img src="/2019/08/11/DDD/p29.png" srcset="/img/loading.gif" alt="Layered Architecture"></p>
+<h1 id="层结构-Layered-Architecture"><a href="#层结构-Layered-Architecture" class="headerlink" title="层结构(Layered Architecture)"></a>层结构(Layered Architecture)</h1><p><img src="p29.png" srcset="/img/loading.gif" alt="Layered Architecture"></p>
 <ul>
 <li>User Interface<br>负责向用户展现信息，并且会解析用户行为，即常说的展现层。</li>
 <li>Application Layer<br>应用层没有任何的业务逻辑代码，它很简单，它主要为程序提供任务处理。</li>
 <li>Domain Layer<br>这一层包含有关领域的信息，是业务的核心，领域模型的状态都直接或间接（持久化至数据库）存储在这一层。</li>
 <li>Infrastructure Layer<br>为其他层提供底层依赖操作。</li>
 </ul>
-<h1 id="模型关系图-Model-Driven-Design"><a href="#模型关系图-Model-Driven-Design" class="headerlink" title="模型关系图(Model-Driven Design)"></a>模型关系图(Model-Driven Design)</h1><p><img src="/2019/08/11/DDD/p28.png" srcset="/img/loading.gif" alt="Model-Driven Design"></p>
+<h1 id="模型关系图-Model-Driven-Design"><a href="#模型关系图-Model-Driven-Design" class="headerlink" title="模型关系图(Model-Driven Design)"></a>模型关系图(Model-Driven Design)</h1><p><img src="p28.png" srcset="/img/loading.gif" alt="Model-Driven Design"></p>
 <h2 id="服务-Services"><a href="#服务-Services" class="headerlink" title="服务(Services)"></a>服务(Services)</h2><p>当我们在分析某一领域时，一直在尝试如何将信息转化为领域模型，但并非所有的点我们都能用Model来涵盖。对象应当有属性，状态和行为，但有时领域中有一些行为是无法映射到具体的对象中的，我们也不能强行将其放入在某一个模型对象中，而将其单独作为一个方法又没有地方，此时就需要服务</p>
 <h2 id="工厂-Factories"><a href="#工厂-Factories" class="headerlink" title="工厂(Factories)"></a>工厂(Factories)</h2><p>在大型系统中，实体和聚合通常是很复杂的，这就导致了很难去通过构造器来创建对象。工厂就决解了这个问题，它把创建对象的细节封装起来，巧妙的实现了依赖反转。当然对聚合也适用（当建立了聚合根时，其他对象可以自动创建）</p>
 <h2 id="仓库-Repository"><a href="#仓库-Repository" class="headerlink" title="仓库(Repository)"></a>仓库(Repository)</h2><p>仓库封装了获取对象的逻辑，领域对象无须和底层数据库交互，它只需要从仓库中获取对象即可。仓库可以存储对象的引用，当一个对象被创建后，它可能会被存储到仓库中，那么下次就可以从仓库取。如果用户请求的数据没在仓库中，则会从数据库里取，这就减少了底层交互的次数</p>
@@ -319,9 +319,9 @@
 <li>事件是一等公民，系统的基础数据是事件，事件需要被储存在数据库中</li>
 <li>业务数据只是由事件产生的视图，不一定需要存储在数据库</li>
 </ul>
-<p>这里展示的例子是一个银行账户经历的几个事件：创建 -&gt; 存款300 -&gt; 存款100 -&gt; 取出200<br><img src="/2019/08/11/DDD/v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
-<p>在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可<br><img src="/2019/08/11/DDD/v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
-<h1 id="CQRS-命令查询责任分离"><a href="#CQRS-命令查询责任分离" class="headerlink" title="CQRS(命令查询责任分离)"></a>CQRS(命令查询责任分离)</h1><p>CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及<br><img src="/2019/08/11/DDD/CQRS.jpg" srcset="/img/loading.gif" alt="CQRS + Event Souring"></p>
+<p>这里展示的例子是一个银行账户经历的几个事件：创建 -&gt; 存款300 -&gt; 存款100 -&gt; 取出200<br><img src="v2-7c6a1b0c101d8f0cf5e89716bfb4d6a1_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
+<p>在这样的设计下，每个对象都需要经历一系列的事件才会转化成现在的状态，当我们只需要进行查询的时候，这些操作未免显得太过累赘，所以我们可以把对象的最终状态存入一个视图数据库，当需要查询的时候直接查询这个数据库即可<br><img src="v2-35249fb2693f44bbe4bf48ea6755c55c_hd.jpg" srcset="/img/loading.gif" alt="Event Souring"></p>
+<h1 id="CQRS-命令查询责任分离"><a href="#CQRS-命令查询责任分离" class="headerlink" title="CQRS(命令查询责任分离)"></a>CQRS(命令查询责任分离)</h1><p>CQRS简单理解就是读写分离，但它的实现可能相对其定义要复杂些，并且通常都是会和Event Souring一起被提及<br><img src="CQRS.jpg" srcset="/img/loading.gif" alt="CQRS + Event Souring"></p>
 <p>参考资料：</p>
 <ul>
 <li>《领域驱动设计：软件核心复杂性应对之道》  </li>
