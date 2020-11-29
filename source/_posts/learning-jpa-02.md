@@ -12,15 +12,25 @@ comments: true
 index_img: /gallery/learning-jpa-02.jpg
 banner_img: /gallery/learning-jpa-02.jpg
 ---
-封面：同上篇，这次前景就是最高机密 Viper Zero。~~嗯，没啥问题，每集一张，只是PS了~~
+本篇介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。
 <!--more-->
----
-这里介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。 
+> 封面：同上篇，这次前景就是最高机密 Viper Zero。~~嗯，没啥问题，每集一张，只是PS了~~
 
-这里还是稍微提一下这几个东西之间的关系。
+## Foreword
+
+### JPA以及其他类似东西之间的关系
+在进入正题之前还是稍微提一下这几个东西之间的关系。
 首先JPA是一种规范，Java EE 中有把这种规范抽象出来的接口，具体实现是看用的什么框架，可以是 Hibernate 或者是 EclipseLink 等。
-而这之中 Spring 又对 Java EE 中的接口再次封装，以更好的整合进 Spring 体系当中，但 SpringDataJPA 仍然是个抽象，具体实现仍然是看选型的框架。
+而这之中 Spring 又对 Java EE 中的接口再次封装，以更好地整合进 Spring 体系当中，但 SpringDataJPA 仍然是个抽象，具体实现仍然是看选型的框架。
 但日常中，由于 SpringDataJPA 默认是 Hibernate 实现，所以一般场合基本相当于 Hibernate。
+
+### 个人对于数据库复杂查询的理解或看法
+对于联表这些事情我个人的感受来说是极为痛苦的，表面上可以不多此查询数据库，不查询多余数据，不需要程序做多次遍历。  
+其实在一些压力不大的场景中，这些都显得很无所谓。多次连接有缓存，多次遍历实际消耗也不大，多余数据实际上做 join 的时候就会拿过来，join 中加入条件也和第二次查询加入条件差不多。
+但实际上最麻烦的，是当真正数据库压力上来了，这些操作都没有太大意义，最后还是会在数据库和程序此之间加入缓存，把数据库做的很多事情放到程序当中去做，尽量减低数据库压力。
+而此时你就会发现之前做的联表查询之类的就像是外来物一样格格不入。
+
+所以我对此也非常欣赏DDD的设计美感。
 
 ## SpringDataJPA
 SpringDataJPA 的复杂查询除了直接写 sql，按照规则定义 Repository 接口方法以外，还可以使用Specification做查询。

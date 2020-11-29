@@ -12,14 +12,13 @@ comments: true
 index_img: /gallery/learning-jpa-01.jpg
 banner_img: /gallery/learning-jpa-01.jpg
 ---
-封面：动画「ガーリー・エアフォース」#08的 EDCard，算是原作插画师[@遠坂あさぎ](https://twitter.com/asagi_0398)的贺图，每集一张。
-有趣的是因为最高机密的特性导致男主看到的样子和幼馴染一样，而此时他的幼馴染正生着气，所以标题叫不高兴的最高机密w
+本篇主要说 Typesafe，下一篇讲一下 JPA 构建复杂查询。项目~~极简~~代码[在这](https://github.com/NatsuSai/spring-data-jpa-demo)
 <!--more-->
----
+> 封面：动画「ガーリー・エアフォース」#08的 EDCard，算是原作插画师[@遠坂あさぎ](https://twitter.com/asagi_0398)的贺图，每集一张。
+> 有趣的是因为最高机密的特性导致男主看到的样子和幼馴染一样，而此时他的幼馴染正生着气，所以标题叫不高兴的最高机密w
+
 最近看了[@hantsy](https://github.com/hantsy/helidon-sample)大大在V站的帖子（[这里](https://www.v2ex.com/t/688051#reply70)、[这里](https://www.v2ex.com/t/688051#reply70)），
 就开始心血来潮想要看看 JPA 怎么玩，另外就是大大所说的 Typesafe 要这么实现。
-
-本篇主要说 Typesafe，下一篇讲一下 Specification 构建复杂查询。项目~~极简~~代码[在这](https://github.com/NatsuSai/spring-data-jpa-demo)
 
 > 注意：这里不会对JPA大多的基础知识进行说明，文章本意是做一次笔记，必要时请充分发挥自主能动性进行查找学习
 
