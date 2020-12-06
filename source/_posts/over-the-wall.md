@@ -1,8 +1,8 @@
 ---
 title: Over the wall
 date: 2020-12-07 01:48:13
-tags: 
-thumbnail: /gallery/Lain.JPG
+index_img: /gallery/Lain.JPG
+banner_img: /gallery/Lain.JPG
 ---
 I will record here some information or opinions that I believe.   
 Everything is selected based on my subjective judgment.
