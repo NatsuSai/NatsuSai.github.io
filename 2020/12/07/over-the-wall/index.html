@@ -16,7 +16,7 @@
   <meta name="description" content="君を見てると、心が震える">
   <meta name="author" content="Kurenai">
   <meta name="keywords" content>
-  <title>学习JPA笔记——构建复杂查询 - Kurenai&#39;s World</title>
+  <title>Over the wall - Kurenai&#39;s World</title>
 
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css">
 
@@ -145,14 +145,14 @@
 </nav>
 
     <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/gallery/learning-jpa-02.jpg') no-repeat center center;
+         style="background: url('/gallery/machi.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="container page-header text-center fade-in-up">
             <span class="h2" id="subtitle">
               
-                学习JPA笔记——构建复杂查询
+                Over the wall
               
             </span>
 
@@ -162,8 +162,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-10-06 09:25" pubdate>
-        2020年10月6日 上午
+      <time datetime="2020-12-07 01:48" pubdate>
+        2020年12月7日 凌晨
       </time>
     </span>
   
@@ -174,7 +174,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      1.9k 字
     </span>
   
 
@@ -184,7 +184,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      15
+      19
        分钟
     </span>
   
@@ -214,7 +214,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto" id="post">
             <!-- SEO header -->
-            <h1 style="display: none">学习JPA笔记——构建复杂查询</h1>
+            <h1 style="display: none">Over the wall</h1>
             
               <p class="note note-info">
                 
@@ -223,115 +223,42 @@
               </p>
             
             <div class="markdown-body" id="post-body">
-              <p>本篇介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。</p>
+              <p>I will record here some information or opinions that I believe.<br>Everything is selected based on my subjective judgment.</p>
 <a id="more"></a>
 <blockquote>
-<p>封面：同上篇，这次前景就是最高机密 Viper Zero。<del>嗯，没啥问题，每集一张，只是PS了</del></p>
+<p>封面 我的头像出处，《Lian》当中的女主铃音，头像以及本封面都是碟子附赠的图片。片子非常意识流，那种感觉就像第一次看 eva 一样，有点跟不上节奏，或者说觉得非常混沌。</p>
 </blockquote>
-<h2 id="Foreword"><a href="#Foreword" class="headerlink" title="Foreword"></a>Foreword</h2><h3 id="JPA以及其他类似东西之间的关系"><a href="#JPA以及其他类似东西之间的关系" class="headerlink" title="JPA以及其他类似东西之间的关系"></a>JPA以及其他类似东西之间的关系</h3><p>在进入正题之前还是稍微提一下这几个东西之间的关系。<br>首先JPA是一种规范，Java EE 中有把这种规范抽象出来的接口，具体实现是看用的什么框架，可以是 Hibernate 或者是 EclipseLink 等。<br>而这之中 Spring 又对 Java EE 中的接口再次封装，以更好地整合进 Spring 体系当中，但 SpringDataJPA 仍然是个抽象，具体实现仍然是看选型的框架。<br>但日常中，由于 SpringDataJPA 默认是 Hibernate 实现，所以一般场合基本相当于 Hibernate。</p>
-<h3 id="个人对于数据库复杂查询的理解或看法"><a href="#个人对于数据库复杂查询的理解或看法" class="headerlink" title="个人对于数据库复杂查询的理解或看法"></a>个人对于数据库复杂查询的理解或看法</h3><p>对于联表这些事情我个人的感受来说是极为痛苦的，表面上可以不多此查询数据库，不查询多余数据，不需要程序做多次遍历。<br>其实在一些压力不大的场景中，这些都显得很无所谓。多次连接有缓存，多次遍历实际消耗也不大，多余数据实际上做 join 的时候就会拿过来，join 中加入条件也和第二次查询加入条件差不多。<br>但实际上最麻烦的，是当真正数据库压力上来了，这些操作都没有太大意义，最后还是会在数据库和程序此之间加入缓存，把数据库做的很多事情放到程序当中去做，尽量减低数据库压力。<br>而此时你就会发现之前做的联表查询之类的就像是外来物一样格格不入。</p>
-<p>所以我对此也非常欣赏DDD的设计美感。</p>
-<h2 id="SpringDataJPA"><a href="#SpringDataJPA" class="headerlink" title="SpringDataJPA"></a>SpringDataJPA</h2><p>SpringDataJPA 的复杂查询除了直接写 sql，按照规则定义 Repository 接口方法以外，还可以使用Specification做查询。</p>
-<h3 id="Specification"><a href="#Specification" class="headerlink" title="Specification"></a>Specification</h3><p>这是SpringDataJPA抽象出的一个接口，故并不一定通用于其他JPA的实现。<br>该接口重点在于<code>toPredicate</code>方法，该方法将创建一个 where 语句对象。</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Specification</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span> </span>&#123;
-
-    ...
-
-    <span class="hljs-comment">/**
-     * Creates a WHERE clause for a query of the referenced entity in form of a  Predicate for the given
-     * Root and CriteriaQuery.
-     */</span>
-    <span class="hljs-meta">@Nullable</span>
-    <span class="hljs-function">Predicate <span class="hljs-title">toPredicate</span><span class="hljs-params">(Root&lt;T&gt; root, CriteriaQuery&lt;?&gt; query, CriteriaBuilder criteriaBuilder)</span></span>;
-&#125;</code></pre></div>
-
-<p>这里我只做简要说明，以便于理解，仅供参考。</p>
-<ul>
-<li>root：<br>  一般指实体类本身，包装成 Root 对象, 可由query.from(Post.class)得到<code>Root&lt;Post&gt;</code>，Java EE 会提到。</li>
-<li>query：<br>  sql语句对象，一般在此方法内部不做调用，Java EE 会给一些用于理解的调用。</li>
-<li>criteriaBuilder：<br>  用于构建条件语句。</li>
-</ul>
+<hr>
+<p><a href="https://www.v2ex.com/t/689630?p=1#r_9241365" target="_blank" rel="noopener">Link</a></p>
 <blockquote>
-<p>个人建议是不要管我说的这些，真要去理解就看源码注释，或者看下面 Java EE 的代码，更能够理解。</p>
+<p>首先，把移民和工作分开：很多人移民了还是要辛苦工作<br>其次，把移民和 “改变命运” 这件事分开：很多人移民了并没有太大的改命<br>然后，把移民和与众不同这件事分开：很多比你条件差的人也成功了<br>然后，把移民和鹤立鸡群这件事分开：即使你移民成功了别人也未必羡慕<br>然后，把移民和生活中任何一件事联系起来：它就像任何一次部门间的工作调动一样平常，组织捞人 捞到你了，组织说让你去海外你就去了，就完事了（和你的个人素质并无关系：比你的英文水平好很多的人，其实也没移民；比你 IT 能力再高的人，其实也没移民；怎么就论到你移民了呢？是的，就是轮到你了。）</p>
+<p>并不高不可攀，甚至就像喝水</p>
+<p>然后，你会发现 V2EX 其实并不是一个特别适合讨论移民这件事的 BBS，尤其是在增强移民信心和让移民可行性落地的方面：盖因它无法像讨论一件普普通通的事情一样讨论移民，它没这心胸。</p>
 </blockquote>
-<h3 id="Getting-Started"><a href="#Getting-Started" class="headerlink" title="Getting Started"></a>Getting Started</h3><p>首先我们创建一个 Repository 接口，并继承<code>JpaSpecificationExecutor&lt;T&gt;</code>以获得复杂查询的能力。</p>
-<div class="hljs"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">PostRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">JpaSpecificationExecutor</span>&lt;<span class="hljs-title">Post</span>&gt; </span>&#123;
-&#125;</code></pre></div>
-
-<p>然后我们运用 java8 所带来的新特性，使用 lambda 构建一个匿名 Specification 的实现类，并实现 toPredicate 方法。</p>
-<div class="hljs"><pre><code class="hljs undefined">repository.findAll(
-    (Specification&lt;Post&gt;) (root, criteriaQuery, builder) -&gt; &#123; 
-        <span class="hljs-comment">// where title like '%Test%';</span>
-        <span class="hljs-keyword">return</span> builder.like(root.<span class="hljs-keyword">get</span>(Post_.title), <span class="hljs-string">"%Test%"</span>)
-        <span class="hljs-comment">// 如果是多个条件，例如 where title like '%Test%' and content like '%Test%' and id &lt; 10;</span>
-        <span class="hljs-keyword">return</span> builder.and(builder.like(root.<span class="hljs-keyword">get</span>(Post_.title), <span class="hljs-string">"%Test%"</span>), builder.like(root.<span class="hljs-keyword">get</span>(Post_.content), <span class="hljs-string">"%Test%"</span>), builder.le(root.<span class="hljs-keyword">get</span>(Post_.id), <span class="hljs-number">10</span>))
-        <span class="hljs-comment">// 而如果我们没有做 Typesafe，那么就会变成这样</span>
-        <span class="hljs-keyword">return</span> builder.like(root.<span class="hljs-keyword">get</span>(<span class="hljs-string">"title"</span>), <span class="hljs-string">"%Test%"</span>)
-    &#125;
-);</code></pre></div>
-
-<p>使用起来其实没什么困难，基本举一反三，其他的复杂查询我暂时没研究，主要是觉得可以避开用别的方法操作，或者提到程序中操作。</p>
-<h2 id="Java-EE"><a href="#Java-EE" class="headerlink" title="Java EE"></a>Java EE</h2><p>实际上，SpringDataJPA 是对 Java EE 原本的 JPA 抽象再次包装了一层，所以这个可以说是原汁原味了。</p>
-<h3 id="Getting-Stated"><a href="#Getting-Stated" class="headerlink" title="Getting Stated"></a>Getting Stated</h3><p>由于我主要使用 SpringDataJPA 所以摘抄了一段代码，<a href="https://github.com/hantsy/helidon-sample/blob/master/mp-jpa/src/main/java/com/example/PostRepository.java" target="_blank" rel="noopener">出处</a>。</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">//需要对此进行注入</span>
-<span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> EntityManage entityManager;
-
-String q;
-int offset, limit;
-
-CriteriaBuilder cb = <span class="hljs-keyword">this</span>.entityManager.getCriteriaBuilder();
-<span class="hljs-comment">// create query</span>
-CriteriaQuery&lt;Post&gt; query = cb.createQuery(Post<span class="hljs-class">.<span class="hljs-keyword">class</span>);</span>
-<span class="hljs-comment">// set the root class</span>
-Root&lt;Post&gt; root = query.from(Post<span class="hljs-class">.<span class="hljs-keyword">class</span>);</span>
-
-<span class="hljs-comment">// if keyword is provided</span>
-<span class="hljs-keyword">if</span> (q != <span class="hljs-literal">null</span> &amp;&amp; !q.trim().isEmpty()) &#123;
-    <span class="hljs-comment">// 这里其实就是上面 toPredicate 返回的对象作为参数传入where方法当中，所以里面就和上面的实现没有什么太大区别。</span>
-    query.<span class="hljs-keyword">where</span>(
-            cb.or(
-                    cb.like(root.<span class="hljs-keyword">get</span>(Post_.title), <span class="hljs-string">"%"</span> + q + <span class="hljs-string">"%"</span>),
-                    cb.like(root.<span class="hljs-keyword">get</span>(Post_.content), <span class="hljs-string">"%"</span> + q + <span class="hljs-string">"%"</span>)
-            )
-    );
-&#125;
-<span class="hljs-comment">//perform query</span>
-<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.entityManager.createQuery(query)
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();</code></pre></div>
-
-<ul>
-<li>EntityManager<br>  实体管理类，用于与持久化上下文进行互动，核心类。</li>
-</ul>
-<p>其他几个 Root、CriteriaQuery、CriteriaBuilder 作用同上，毕竟spring只是做了封装。<br>看完上面代码，大致就能够了解清楚这几个类分别是怎么使用的了，总体来说其实比上面spring的实现所接触到的东西更加全面一些，也能够理解这几个类互相是怎么作用的了。</p>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://github.com/hantsy/helidon-sample/blob/master/mp-jpa/src/main/java/com/example/PostRepository.java" target="_blank" rel="noopener">helidon-sample</a> @ <a href="https://github.com/hantsy" target="_blank" rel="noopener">hantsy</a></p>
+<p><a href="https://www.v2ex.com/t/731552?p=2#r_9874141" target="_blank" rel="noopener">Link</a></p>
+<blockquote>
+<p>不想反驳一些人的观点，毕竟每个人都有表达自己观点的权利。</p>
+<p>但是，作为一个个体，你需要明确：</p>
+<p>1 、你的一辈子很短，你必须优先考虑眼前的幸福，而不是未来潜在的幸福。比如，我承认中国在改善、在发展，但是在可见的未来几十年，许多问题依然不会得到解决（ e.g.建立独立的司法体系、健全对弱势群体的保护）。这是一个价值观选择题：你选择去伟大地建设这个国家，还是优先保护自己和家人？很遗憾，我比较自私，我也不是伟人，我选择短期内更能保护我个人利益（ e.g.有健全的劳动法、有工会、可以自由访问互联网并且自由交流思想）的地方。</p>
+<p>2 、国家是一个政治概念，是一个“协议”、“合同”，而不是一种与生俱来的强加于个体的道德义务。有兴趣的可以参考这里的讨论： <a href="https://www.zhihu.com/question/48440859" target="_blank" rel="noopener">https://www.zhihu.com/question/48440859</a> 。所以，不要被这种政治概念和集体思想绑架，否则你就是韭菜——或者你是站在有资源的那一边，可以利用这个概念去绑架别人、割别人韭菜。</p>
+<p>3 、移民与否，取决于你在哪里更有优势、能活得更好。我认识的大部分回国的同学，都是在国内非富即贵的。我想了想，似乎非常合理：因为他们回去可以轻而易举地活得很好甚至随意割别人韭菜。如果你也是有本事割别人韭菜的，那就留在国内，毕竟国内机会比较多。但是如果你不属于这种，那么就想想你最在乎什么（ e.g.钱？健康？生活丰富度？稳定性？冒险刺激？相对公平的允许你靠自身努力上升的发展平台？）、如果去国外你是不是可以活得更开心（ e.g.哪些地方可以提供你在乎的这些东西）？</p>
+<p>没有一个国家是完美的，日韩、欧洲、美国、新加坡都有各自的问题（日韩-经济并不是很好、并不是未来的主流市场、发展上限较低；欧洲-经济也不是特别好，除了德国英国稍微好点；美国-在太平洋两岸两位书记的联手协作下，民粹主义盛行；新加坡-主要产业为金融服务业，没有太多 tech 行业的机会）。如果你想追求刺激、追求暴富，那么可能中国更适合你。</p>
+<p>但是国内也有国内的问题——e.g.摘取 11 例器官判 2 年 4 个月，写小黄书判 10 年半； 996 是常态；弱势群体随时有可能被“集体”绑架和以“维护集体利益”的名义牺牲。坦白说，中国虽然近年经济发展迅速，但是在对国民个体的保护上与西方国家还差着一整个“文艺复兴”（西方所有价值观的基础——“以人为本、破除神权”）。如果你觉得自己是一个弱势群体，那么可能中国对你来说就是 hard 模式。</p>
+<p>最后，再次非常诚恳地建议很多和我一样的“弱势群体”，不要被别人割了韭菜，还帮着人家吆喝。保护好自己和家人、健康快乐地过好自己短暂的一生，这才是最重要的、这也是作为一个人的基本天性和权利—— [身为韭菜，不要自己给自己画饼] 。</p>
+</blockquote>
+<p><a href="https://www.v2ex.com/t/731552?p=2#r_9874150" target="_blank" rel="noopener">Link</a> </p>
+<blockquote>
+<p>另外关于移民途径，似乎现在还是挺多的——人口减少是许多发达国家面临的巨大挑战，所以只要你年轻还是有很多机会的。全球发达国家中似乎只有美国是移民非常难的。</p>
+<p>1 、加拿大——读书、拿工作签、枫叶卡；甚至如果不去加拿大读书和工作也可以直接申请枫叶卡，只要你打分足够——年纪轻加分、高学历加分、工作经验加分（自行搜索加拿大移民 Express Entry 打分系统）；<br>2 、新加坡——只要能找到工作就能申请到工作签和之后申请绿卡，没有名额限制。位于新加坡的 tech 公司虽然不多，但还是有几家，之前在 v 站也看到过相关的招人贴，请自行搜索；<br>3 、欧洲——只要能找到工作，就能申请到工作签并且之后申请绿卡，无名额限制。但是直接找欧洲工作比较难找，因为欧洲人自己找工作本身就比较难了（尤其是英国，暂且还是把英国算在欧洲吧 lol ）。加入国际公司再申请内部 relocation 的思路比较有实操意义，前提是你能说服老板为什么要 relocate 。要么就还是读书、工作签、申请绿卡，也不是很难。<br>4 、美国——除非能直接找到工作并且申请到 H1B，或者加入在华美国公司一年后以 L1 签证调来美国；要么就是读书、找工作、申请 H1B 、申请绿卡；要么就是投资移民、结婚移民等途径了。<br>5 、日韩——不清楚，按理说也不会很难。  </p>
+<p>途径还是一直有的，就看你愿不愿意冒险和花成本了。经济上，我之前也见过许多国际学生贷款来读书的——可能国内觉得不可思议，但是美国挺常见的，如果你读 MBA 或者 JD 或者 STEM 这种未来赚钱能力强的学位，无需美国人担保即可贷款，请自行搜索 Prodigy Finance 。学校申请上，你如果是为了找工作，未必一定要申请顶尖名校，找工作够用就行。</p>
+<p>所以，加油！</p>
+</blockquote>
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/Java/">Java</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
-                    
-                      <a class="hover-with-bg" href="/tags/ORM/">ORM</a>
-                    
-                      <a class="hover-with-bg" href="/tags/JPA/">JPA</a>
-                    
-                      <a class="hover-with-bg" href="/tags/Hibernate/">Hibernate</a>
-                    
-                  </div>
                 
               </div>
               
@@ -342,18 +269,12 @@ Root&lt;Post&gt; root = query.from(Post<span class="hljs-class">.<span class="hl
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2020/12/07/over-the-wall/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Over the wall</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2020/10/06/learning-jpa-01/">
-                        <span class="hidden-mobile">学习JPA笔记——使用MetaModel实现Typesafe</span>
+                      <a href="/2020/10/06/learning-jpa-02/">
+                        <span class="hidden-mobile">学习JPA笔记——构建复杂查询</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
