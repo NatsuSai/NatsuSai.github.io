@@ -140,123 +140,105 @@
       </tags>
   </entry>
   <entry>
-    <title>Nginx基础——Rewrite规则</title>
-    <url>/2018/12/30/Nginx%E5%9F%BA%E7%A1%80%E2%80%94%E2%80%94Rewrite%E8%A7%84%E5%88%99/</url>
-    <content><![CDATA[<p>&emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。</p>
+    <title>Reactor中的上下文</title>
+    <url>/2020/09/08/context-of-reactor/</url>
+    <content><![CDATA[<p>由于参与的项目当中决定用 <a href="https://github.com/spring-cloud/spring-cloud-gateway" target="_blank" rel="noopener">spring-cloud-gateway</a> 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    </p>
+<p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
 <a id="more"></a>
-<h2 id="正则匹配规则"><a href="#正则匹配规则" class="headerlink" title="正则匹配规则"></a>正则匹配规则</h2><blockquote><p>~  区分大小写匹配<br><del>* 不区分大小写匹配<br>!</del> 和 !~* 区分大小写不匹配及不区分大小写不匹配  </p>
-</blockquote>
 
-<h2 id="文件及目录匹配"><a href="#文件及目录匹配" class="headerlink" title="文件及目录匹配"></a>文件及目录匹配</h2><blockquote><p>-f和!-f 判断是否存在文件<br>-d和!-d 判断是否存在目录<br>-e和!-e 判断是否存在文件或目录<br>-x和!-x 判断文件是否可执行</p>
-</blockquote>
+<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><p>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。<br>但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 ThreadLocal 自然也就失去上下文储存对象的能力。</p>
+<p>经过简单的谷歌查询，我只能想两种处理方法：  </p>
+<ol>
+<li>从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。</li>
+<li>直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。</li>
+</ol>
+<p>但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然就无法添加国际化的变量。</p>
+<h2 id="How-should-I-do"><a href="#How-should-I-do" class="headerlink" title="How should I do"></a>How should I do</h2><h3 id="如何取值"><a href="#如何取值" class="headerlink" title="如何取值"></a>如何取值</h3><p>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是<code>ReactiveSecurityContextHolder</code>，对应 Servlet 当中的<code>SecurityContextHolder</code>。</p>
+<p>ReactiveSecurityContextHolder#getContext</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
 
-<h2 id="rewrite基本语法"><a href="#rewrite基本语法" class="headerlink" title="rewrite基本语法"></a>rewrite基本语法</h2><div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">set</span>  
-<span class="hljs-keyword">if</span>  
-<span class="hljs-keyword">return</span>
-<span class="hljs-keyword">break</span>
-rewrite</code></pre></div>
-
-<h3 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h3><blockquote><p>使用范围：server，location，if;  </p>
-</blockquote> 
-
-<p>中断当前相同作用域的其他nginx配置。 </p>
-<h3 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h3><blockquote><p>使用范围：server，location  </p>
-</blockquote> 
-
-<p>检查一个条件是否符合。If指令不支持嵌套，不支持多个条件&amp;&amp;和||处理。</p>
-<h3 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h3><blockquote><p>格式：return code ;<br>使用范围：server，location，if;</p>
-</blockquote> 
-
-<p>结束规则的执行并返回状态码给客户端。</p>
-<h3 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h3><blockquote><p>使用环境：server，location，if  </p>
-</blockquote> 
-
-<p>定义一个变量，并给变量赋值。变量的值可以为文本、变量或者变量的组合。</p>
-<div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">set</span> <span class="hljs-variable">$var</span> <span class="hljs-string">"hello world"</span></code></pre></div>
-
-<h2 id="rewrite指令格式"><a href="#rewrite指令格式" class="headerlink" title="rewrite指令格式"></a>rewrite指令格式</h2><div class="hljs"><pre><code>rewrite regex replacement [flag]</code></pre></div><p>flag标志位有四种：</p>
-<blockquote><p>break：停止rewrite检测,也就是说当含有break flag的rewrite语句被执行时,该语句就是rewrite的最终结果。<br>last：停止rewrite检测,但是跟break有本质的不同,last的语句不一定是最终结果。<br>redirect：返回302临时重定向，一般用于重定向到完整的URL(包含http:部分)<br>permanent：返回301永久重定向，一般用于重定向到完整的URL(包含http:部分) </p>
-</blockquote> 
-
-<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><p>当访问的文件和目录不存在时，重定向到某个php文件</p>
-<div class="hljs"><pre><code class="hljs ">if( !-e $request_filename )
-&#123;
-    rewrite ^/(.*)$ <span class="hljs-keyword">index</span>.php <span class="hljs-keyword">last</span>;
+<span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
+            .<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
+            .flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
 &#125;</code></pre></div>
 
-<p>目录对换 /123456/xxxx ====&gt; /xxxx?id=123456</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(\d+)/(.+)/</span>  /<span class="hljs-variable">$2</span>?id=<span class="hljs-variable">$1</span> <span class="hljs-literal">last</span>;</code></pre></div>
+<p>可以看到，通过<code>Mono.subscriberContext()</code>，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。<br>这里需要注意，如果直接获取值会抛出异常。   </p>
+<h3 id="如何赋值"><a href="#如何赋值" class="headerlink" title="如何赋值"></a>如何赋值</h3><p>当我查看<code>withSecurityContext</code>方法时，其注释告诉我是用来创建一个包含<code>SecurityContext</code>的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  </p>
+<p>所以当我们查看有什么方法调用它时，就会发现<code>ReactorContextWebFilter</code>这个过滤器。</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
 
-<p>如果客户端使用的是IE浏览器，则重定向到/ie目录下</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">if</span>( <span class="hljs-variable">$http_user_agent</span> ~ MSIE)
-&#123;
-    rewrite ^(.*)$ <span class="hljs-regexp">/ie/</span><span class="hljs-variable">$1</span> <span class="hljs-keyword">break</span>;
-&#125;</code></pre></div>
-
-<p>禁止访问以/data开头的文件</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">location</span> <span class="hljs-title">~ ^/data</span>
-&#123;
-    <span class="hljs-keyword">deny</span> all;
-&#125;</code></pre></div>
-
-<p>禁止访问以.sh，.flv，.mp3为文件后缀名的文件</p>
-<div class="hljs"><pre><code class="hljs ">location ~ .*\.(sh|<span class="hljs-type">flv</span>|<span class="hljs-type">mp3</span>)$
-&#123;
-    <span class="hljs-keyword">return</span> <span class="hljs-number">403</span>;
-&#125;</code></pre></div>
-
-<p>设置某些类型文件的浏览器缓存时间</p>
-<div class="hljs"><pre><code class="hljs ">location ~ .*\.(gif|<span class="hljs-type">jpg</span>|<span class="hljs-type">jpeg</span>|<span class="hljs-type">png</span>|<span class="hljs-type">bmp</span>|<span class="hljs-type">swf</span>)$
-&#123;
-    expires <span class="hljs-number">30</span>d;
-&#125;</code></pre></div>
-
-<p>文件反盗链并设置过期时间</p>
-<div class="hljs"><pre><code class="hljs ">location ~*^.+\.(jpg<span class="hljs-params">|jpeg|</span>gif<span class="hljs-params">|png|</span>swf<span class="hljs-params">|rar|</span>zip<span class="hljs-params">|css|</span>js)$ 
-&#123;
-    valid_referers none blocked *.linuxidc.com*.linuxidc.net localhost <span class="hljs-number">208.97</span>.<span class="hljs-number">167.194</span>;
-    <span class="hljs-keyword">if</span> ($invalid_referer) &#123;
-        rewrite ^<span class="hljs-regexp">/ http:/</span><span class="hljs-regexp">/img.linuxidc.net/leech</span>.gif;
-        <span class="hljs-keyword">return</span> <span class="hljs-number">412</span>;
-        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
+        Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
+        <span class="hljs-keyword">this</span>.repository = repository;
     &#125;
-    access_log  off;
-    root /opt/lampp/htdocs/web;
-    expires <span class="hljs-number">3</span>d;
-    <span class="hljs-keyword">break</span>;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withSecurityContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
+            .<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
+    &#125;
 &#125;</code></pre></div>
 
-<p>将多级目录下的文件转成一个文件，增强seo效果</p>
-<div class="hljs"><pre><code class="hljs ">  
-/job<span class="hljs-number">-123</span><span class="hljs-number">-456</span><span class="hljs-number">-789.</span>html 指向/job/<span class="hljs-number">123</span>/<span class="hljs-number">456</span>/<span class="hljs-number">789.</span>html
-
-rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)\.html$ /job/$<span class="hljs-number">1</span>/$<span class="hljs-number">2</span>/jobshow_$<span class="hljs-number">3.</span>html last;</code></pre></div>
-
-<p>域名跳转</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-section">server</span>
-&#123;
-    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
-    <span class="hljs-attribute">server_name</span> jump.linuxidc.com;
-    <span class="hljs-attribute">index</span> index.html index.htm index.php;
-    <span class="hljs-attribute">root</span> /opt/lampp/htdocs/www;
-    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/</span> http://www.linuxidc.com/;
-    <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;
+<p>ServerSecurityContextRepository#load</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
+    <span class="hljs-keyword">return</span> exchange.getSession()
+        .map(WebSession::getAttributes)
+        .flatMap( attrs -&gt; &#123;
+            SecurityContext context = (SecurityContext) attrs.<span class="hljs-keyword">get</span>(<span class="hljs-keyword">this</span>.springSecurityContextAttrName);
+            <span class="hljs-keyword">return</span> Mono.justOrEmpty(context);
+        &#125;);
 &#125;</code></pre></div>
 
-<p>多域名转向</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">server_name</span> www.linuxidc.comwww.linuxidc.net;
-<span class="hljs-attribute">index</span> index.html index.htm index.php;
-<span class="hljs-attribute">root</span>  /opt/lampp/htdocs;
-<span class="hljs-attribute">if</span> (<span class="hljs-variable">$host</span> <span class="hljs-regexp">~ "linuxidc\.net")</span> &#123;
-    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)</span> http://www.linuxidc.com<span class="hljs-variable">$1</span>permanent;
+<p>ReactiveSecurityContextHolder#withSecurityContext</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
 &#125;</code></pre></div>
+
+<p>通过阅读上面的代码可得知，上面的过滤器通过<code>ServerSecurityContextRepository</code>解析请求中的 Security 上下文，通过<code>ReactiveSecurityContextHolder</code>生成 Securtiy 上下文对象并返回。</p>
+<h2 id="Finally"><a href="#Finally" class="headerlink" title="Finally"></a>Finally</h2><p>我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  </p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
+    
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
+        <span class="hljs-keyword">return</span> chain.filter(exchange)
+            .subscriberContext(c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
+                <span class="hljs-type">withLocaleContext</span></span>(c, exchange)
+            );
+    &#125;
+
+    <span class="hljs-keyword">private</span> Context withLocaleContext(Context mainContext, ServerWebExchange exchange) &#123;
+        <span class="hljs-comment">//解析请求获取 Locale </span>
+        Locale locale = getLocale(exchcange);
+        <span class="hljs-keyword">return</span> mainContext.putAll(Context.of(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-type">Mono.justOrEmpty</span></span>(locale)));
+    &#125;
+&#125;
+
+<span class="hljs-comment">//获取 Locale</span>
+Mono.subscriberContext()
+            .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
+            .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
+
+<p>具体实现我日后会写一个demo。<del>咕咕咕</del></p>
 ]]></content>
       <categories>
-        <category>Nginx</category>
+        <category>Java</category>
+        <category>Reactor</category>
       </categories>
       <tags>
-        <tag>Nginx</tag>
-        <tag>转载</tag>
+        <tag>Java</tag>
+        <tag>Reactor</tag>
+        <tag>Webflux</tag>
+        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
@@ -436,108 +418,6 @@ main
       </tags>
   </entry>
   <entry>
-    <title>Reactor中的上下文</title>
-    <url>/2020/09/08/context-of-reactor/</url>
-    <content><![CDATA[<p>由于参与的项目当中决定用 <a href="https://github.com/spring-cloud/spring-cloud-gateway" target="_blank" rel="noopener">spring-cloud-gateway</a> 作为网关，所以自然就碰上了Reactor当中获取上下文的问题。    </p>
-<p>这里我是遇到了 I18N 需要获取上下文中 Locale 的问题，所以我就以这个问题举例，提供其中一种上下文的解决方法。  </p>
-<a id="more"></a>
-
-<h2 id="What-happened"><a href="#What-happened" class="headerlink" title="What happened"></a>What happened</h2><p>在使用 I18N 进行国际化时，Servlet 框架下我们通常会使用 ThreadLocal 进行储存解析请求得到上下文的 Locale 对象，以判断当前请求需要的是什么语言。<br>但在 Reactor 框架下，由于一个请求整个流程下来，线程都在不断的进行切换，所以 ThreadLocal 自然也就失去上下文储存对象的能力。</p>
-<p>经过简单的谷歌查询，我只能想两种处理方法：  </p>
-<ol>
-<li>从 controller 获取 Locale 或者任意能够得到 Exchange（类似 Request）的方法开始一路传递下去。</li>
-<li>直接将 I18N 的 key 传入自定义异常对象当中，然后在统一异常处理类当中获取 Exchange 再做进一步的国际化操作。</li>
-</ol>
-<p>但他们都不够优雅，而且其中弊端也很明显，一个是需要无限传递变量，一个是只能限制再异常处理类进行处理，理所当然就无法添加国际化的变量。</p>
-<h2 id="How-should-I-do"><a href="#How-should-I-do" class="headerlink" title="How should I do"></a>How should I do</h2><h3 id="如何取值"><a href="#如何取值" class="headerlink" title="如何取值"></a>如何取值</h3><p>令人喜悦的是，Spring 其实已经写了一个获取上下文的例子了，它就是<code>ReactiveSecurityContextHolder</code>，对应 Servlet 当中的<code>SecurityContextHolder</code>。</p>
-<p>ReactiveSecurityContextHolder#getContext</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Class</span>&lt;?&gt; <span class="hljs-type">SECURITY_CONTEXT_KEY</span> = <span class="hljs-type">SecurityContext</span><span class="hljs-class">.<span class="hljs-keyword">class</span>;
-
-<span class="hljs-title">public</span> <span class="hljs-title">static</span> <span class="hljs-title">Mono</span>&lt;<span class="hljs-title">SecurityContext</span>&gt; <span class="hljs-title">getContext</span>() </span>&#123;
-        <span class="hljs-keyword">return</span> <span class="hljs-type">Mono</span>.subscriberContext()
-            .<span class="hljs-built_in">filter</span>( <span class="hljs-built_in">c</span> -&gt; <span class="hljs-built_in">c</span>.hasKey(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>))       
-            .flatMap( <span class="hljs-built_in">c</span>-&gt; <span class="hljs-built_in">c</span>.&lt;<span class="hljs-type">Mono</span>&lt;<span class="hljs-type">SecurityContext</span>&gt;&gt;<span class="hljs-keyword">get</span>(<span class="hljs-type">SECURITY_CONTEXT_KEY</span>));
-&#125;</code></pre></div>
-
-<p>可以看到，通过<code>Mono.subscriberContext()</code>，我们可以得到一个上下文对象，然后他先判断是否包含给出的key值，包含则获取值。<br>这里需要注意，如果直接获取值会抛出异常。   </p>
-<h3 id="如何赋值"><a href="#如何赋值" class="headerlink" title="如何赋值"></a>如何赋值</h3><p>当我查看<code>withSecurityContext</code>方法时，其注释告诉我是用来创建一个包含<code>SecurityContext</code>的 Reactor 上下文对象（Context）并可被用于与其他上下文对象（Context）进行合并。  </p>
-<p>所以当我们查看有什么方法调用它时，就会发现<code>ReactorContextWebFilter</code>这个过滤器。</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ServerSecurityContextRepository repository;
-
-    <span class="hljs-keyword">public</span> ReactorContextWebFilter(ServerSecurityContextRepository repository) &#123;
-        Assert.notNull(repository, <span class="hljs-string">"repository cannot be null"</span>);
-        <span class="hljs-keyword">this</span>.repository = repository;
-    &#125;
-
-    <span class="hljs-meta">@Override</span>
-    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
-        <span class="hljs-keyword">return</span> chain.filter(exchange)
-            .subscriberContext(c -&gt; c.hasKey(SecurityContext<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
-                <span class="hljs-type">withSecurityContext</span></span>(c, exchange)
-            );
-    &#125;
-
-    <span class="hljs-keyword">private</span> Context withSecurityContext(Context mainContext, ServerWebExchange exchange) &#123;
-        <span class="hljs-keyword">return</span> mainContext.putAll(<span class="hljs-keyword">this</span>.repository.load(exchange)
-            .<span class="hljs-keyword">as</span>(ReactiveSecurityContextHolder::withSecurityContext));
-    &#125;
-&#125;</code></pre></div>
-
-<p>ServerSecurityContextRepository#load</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> Mono&lt;SecurityContext&gt; load(ServerWebExchange exchange) &#123;
-    <span class="hljs-keyword">return</span> exchange.getSession()
-        .map(WebSession::getAttributes)
-        .flatMap( attrs -&gt; &#123;
-            SecurityContext context = (SecurityContext) attrs.<span class="hljs-keyword">get</span>(<span class="hljs-keyword">this</span>.springSecurityContextAttrName);
-            <span class="hljs-keyword">return</span> Mono.justOrEmpty(context);
-        &#125;);
-&#125;</code></pre></div>
-
-<p>ReactiveSecurityContextHolder#withSecurityContext</p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function">Context <span class="hljs-title">withSecurityContext</span><span class="hljs-params">(Mono&lt;? <span class="hljs-keyword">extends</span> SecurityContext&gt; securityContext)</span> </span>&#123;
-    <span class="hljs-function"><span class="hljs-keyword">return</span> Context.<span class="hljs-title">of</span><span class="hljs-params">(SECURITY_CONTEXT_KEY, securityContext)</span></span>;
-&#125;</code></pre></div>
-
-<p>通过阅读上面的代码可得知，上面的过滤器通过<code>ServerSecurityContextRepository</code>解析请求中的 Security 上下文，通过<code>ReactiveSecurityContextHolder</code>生成 Securtiy 上下文对象并返回。</p>
-<h2 id="Finally"><a href="#Finally" class="headerlink" title="Finally"></a>Finally</h2><p>我们可以仿照着写一个从请求对象当中解析出一个 Locale 对象并放入上下文当中（不确定是不是上下文，但是Reactor确实是用这种办法实现了上下文的功能）。  </p>
-<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-comment">// 将 Locale 放到上下文中</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReactorLocaleContextWebFilter</span> <span class="hljs-title">implements</span> <span class="hljs-title">WebFilter</span> </span>&#123;
-    
-    <span class="hljs-meta">@Override</span>
-    <span class="hljs-keyword">public</span> Mono&lt;<span class="hljs-built_in">Void</span>&gt; filter(ServerWebExchange exchange, WebFilterChain chain) &#123;
-        <span class="hljs-keyword">return</span> chain.filter(exchange)
-            .subscriberContext(c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>) ? <span class="hljs-title">c</span> :
-                <span class="hljs-type">withLocaleContext</span></span>(c, exchange)
-            );
-    &#125;
-
-    <span class="hljs-keyword">private</span> Context withLocaleContext(Context mainContext, ServerWebExchange exchange) &#123;
-        <span class="hljs-comment">//解析请求获取 Locale </span>
-        Locale locale = getLocale(exchcange);
-        <span class="hljs-keyword">return</span> mainContext.putAll(Context.of(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-type">Mono.justOrEmpty</span></span>(locale)));
-    &#125;
-&#125;
-
-<span class="hljs-comment">//获取 Locale</span>
-Mono.subscriberContext()
-            .filter( c -&gt; c.hasKey(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>))       </span>
-            .flatMap( c-&gt; c.&lt;Mono&lt;Locale&gt;&gt;<span class="hljs-keyword">get</span>(Locale<span class="hljs-class">.<span class="hljs-keyword">class</span>));</span></code></pre></div>
-
-<p>具体实现我日后会写一个demo。<del>咕咕咕</del></p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Reactor</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Reactor</tag>
-        <tag>Webflux</tag>
-        <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>学习JPA笔记——使用MetaModel实现Typesafe</title>
     <url>/2020/10/06/learning-jpa-01/</url>
     <content><![CDATA[<p>本篇主要说 Typesafe，下一篇讲一下 JPA 构建复杂查询。项目<del>极简</del>代码<a href="https://github.com/NatsuSai/spring-data-jpa-demo" target="_blank" rel="noopener">在这</a></p>
@@ -685,6 +565,126 @@ Mono.subscriberContext()
       </tags>
   </entry>
   <entry>
+    <title>Nginx基础——Rewrite规则</title>
+    <url>/2018/12/30/Nginx%E5%9F%BA%E7%A1%80%E2%80%94%E2%80%94Rewrite%E8%A7%84%E5%88%99/</url>
+    <content><![CDATA[<p>&emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。</p>
+<a id="more"></a>
+<h2 id="正则匹配规则"><a href="#正则匹配规则" class="headerlink" title="正则匹配规则"></a>正则匹配规则</h2><blockquote><p>~  区分大小写匹配<br><del>* 不区分大小写匹配<br>!</del> 和 !~* 区分大小写不匹配及不区分大小写不匹配  </p>
+</blockquote>
+
+<h2 id="文件及目录匹配"><a href="#文件及目录匹配" class="headerlink" title="文件及目录匹配"></a>文件及目录匹配</h2><blockquote><p>-f和!-f 判断是否存在文件<br>-d和!-d 判断是否存在目录<br>-e和!-e 判断是否存在文件或目录<br>-x和!-x 判断文件是否可执行</p>
+</blockquote>
+
+<h2 id="rewrite基本语法"><a href="#rewrite基本语法" class="headerlink" title="rewrite基本语法"></a>rewrite基本语法</h2><div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">set</span>  
+<span class="hljs-keyword">if</span>  
+<span class="hljs-keyword">return</span>
+<span class="hljs-keyword">break</span>
+rewrite</code></pre></div>
+
+<h3 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h3><blockquote><p>使用范围：server，location，if;  </p>
+</blockquote> 
+
+<p>中断当前相同作用域的其他nginx配置。 </p>
+<h3 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h3><blockquote><p>使用范围：server，location  </p>
+</blockquote> 
+
+<p>检查一个条件是否符合。If指令不支持嵌套，不支持多个条件&amp;&amp;和||处理。</p>
+<h3 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h3><blockquote><p>格式：return code ;<br>使用范围：server，location，if;</p>
+</blockquote> 
+
+<p>结束规则的执行并返回状态码给客户端。</p>
+<h3 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h3><blockquote><p>使用环境：server，location，if  </p>
+</blockquote> 
+
+<p>定义一个变量，并给变量赋值。变量的值可以为文本、变量或者变量的组合。</p>
+<div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">set</span> <span class="hljs-variable">$var</span> <span class="hljs-string">"hello world"</span></code></pre></div>
+
+<h2 id="rewrite指令格式"><a href="#rewrite指令格式" class="headerlink" title="rewrite指令格式"></a>rewrite指令格式</h2><div class="hljs"><pre><code>rewrite regex replacement [flag]</code></pre></div><p>flag标志位有四种：</p>
+<blockquote><p>break：停止rewrite检测,也就是说当含有break flag的rewrite语句被执行时,该语句就是rewrite的最终结果。<br>last：停止rewrite检测,但是跟break有本质的不同,last的语句不一定是最终结果。<br>redirect：返回302临时重定向，一般用于重定向到完整的URL(包含http:部分)<br>permanent：返回301永久重定向，一般用于重定向到完整的URL(包含http:部分) </p>
+</blockquote> 
+
+<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><p>当访问的文件和目录不存在时，重定向到某个php文件</p>
+<div class="hljs"><pre><code class="hljs ">if( !-e $request_filename )
+&#123;
+    rewrite ^/(.*)$ <span class="hljs-keyword">index</span>.php <span class="hljs-keyword">last</span>;
+&#125;</code></pre></div>
+
+<p>目录对换 /123456/xxxx ====&gt; /xxxx?id=123456</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(\d+)/(.+)/</span>  /<span class="hljs-variable">$2</span>?id=<span class="hljs-variable">$1</span> <span class="hljs-literal">last</span>;</code></pre></div>
+
+<p>如果客户端使用的是IE浏览器，则重定向到/ie目录下</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">if</span>( <span class="hljs-variable">$http_user_agent</span> ~ MSIE)
+&#123;
+    rewrite ^(.*)$ <span class="hljs-regexp">/ie/</span><span class="hljs-variable">$1</span> <span class="hljs-keyword">break</span>;
+&#125;</code></pre></div>
+
+<p>禁止访问以/data开头的文件</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">location</span> <span class="hljs-title">~ ^/data</span>
+&#123;
+    <span class="hljs-keyword">deny</span> all;
+&#125;</code></pre></div>
+
+<p>禁止访问以.sh，.flv，.mp3为文件后缀名的文件</p>
+<div class="hljs"><pre><code class="hljs ">location ~ .*\.(sh|<span class="hljs-type">flv</span>|<span class="hljs-type">mp3</span>)$
+&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">403</span>;
+&#125;</code></pre></div>
+
+<p>设置某些类型文件的浏览器缓存时间</p>
+<div class="hljs"><pre><code class="hljs ">location ~ .*\.(gif|<span class="hljs-type">jpg</span>|<span class="hljs-type">jpeg</span>|<span class="hljs-type">png</span>|<span class="hljs-type">bmp</span>|<span class="hljs-type">swf</span>)$
+&#123;
+    expires <span class="hljs-number">30</span>d;
+&#125;</code></pre></div>
+
+<p>文件反盗链并设置过期时间</p>
+<div class="hljs"><pre><code class="hljs ">location ~*^.+\.(jpg<span class="hljs-params">|jpeg|</span>gif<span class="hljs-params">|png|</span>swf<span class="hljs-params">|rar|</span>zip<span class="hljs-params">|css|</span>js)$ 
+&#123;
+    valid_referers none blocked *.linuxidc.com*.linuxidc.net localhost <span class="hljs-number">208.97</span>.<span class="hljs-number">167.194</span>;
+    <span class="hljs-keyword">if</span> ($invalid_referer) &#123;
+        rewrite ^<span class="hljs-regexp">/ http:/</span><span class="hljs-regexp">/img.linuxidc.net/leech</span>.gif;
+        <span class="hljs-keyword">return</span> <span class="hljs-number">412</span>;
+        <span class="hljs-keyword">break</span>;
+    &#125;
+    access_log  off;
+    root /opt/lampp/htdocs/web;
+    expires <span class="hljs-number">3</span>d;
+    <span class="hljs-keyword">break</span>;
+&#125;</code></pre></div>
+
+<p>将多级目录下的文件转成一个文件，增强seo效果</p>
+<div class="hljs"><pre><code class="hljs ">  
+/job<span class="hljs-number">-123</span><span class="hljs-number">-456</span><span class="hljs-number">-789.</span>html 指向/job/<span class="hljs-number">123</span>/<span class="hljs-number">456</span>/<span class="hljs-number">789.</span>html
+
+rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)\.html$ /job/$<span class="hljs-number">1</span>/$<span class="hljs-number">2</span>/jobshow_$<span class="hljs-number">3.</span>html last;</code></pre></div>
+
+<p>域名跳转</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-section">server</span>
+&#123;
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+    <span class="hljs-attribute">server_name</span> jump.linuxidc.com;
+    <span class="hljs-attribute">index</span> index.html index.htm index.php;
+    <span class="hljs-attribute">root</span> /opt/lampp/htdocs/www;
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/</span> http://www.linuxidc.com/;
+    <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;
+&#125;</code></pre></div>
+
+<p>多域名转向</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">server_name</span> www.linuxidc.comwww.linuxidc.net;
+<span class="hljs-attribute">index</span> index.html index.htm index.php;
+<span class="hljs-attribute">root</span>  /opt/lampp/htdocs;
+<span class="hljs-attribute">if</span> (<span class="hljs-variable">$host</span> <span class="hljs-regexp">~ "linuxidc\.net")</span> &#123;
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)</span> http://www.linuxidc.com<span class="hljs-variable">$1</span>permanent;
+&#125;</code></pre></div>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>学习JPA笔记——构建复杂查询</title>
     <url>/2020/10/06/learning-jpa-02/</url>
     <content><![CDATA[<p>本篇介绍两种 JPA 做复杂查询的方法，一个是用 SpringDataJPA 实现， 一个是用 Java EE 实现。</p>
@@ -782,6 +782,20 @@ Root&lt;Post&gt; root = query.from(Post<span class="hljs-class">.<span class="hl
       </tags>
   </entry>
   <entry>
+    <title>とある三秋 缒の摘抄</title>
+    <url>/2017/05/20/%E3%81%A8%E3%81%82%E3%82%8B%E4%B8%89%E7%A7%8B%20%E7%BC%92%E7%9A%84%E4%B8%80%E4%BA%9B%E6%91%98%E6%8A%84/</url>
+    <content><![CDATA[<p>记录一下比较打动我的一些段落</p>
+<a id="more"></a>
+<blockquote><h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>&emsp;&emsp;这世上到处都有地洞，至少世界看在我眼里就是这样。有的洞小，有的洞大；有的洞浅，有的洞深；有的洞很明显，有的洞不明显；有的洞尚有人掉进去，有的洞已经有许多人掉进去。真的是五花八门。一旦想着这一个个地洞，就会让我满心不安，一步都不想动了。<br>&emsp;&emsp;孩提时代，我喜欢那种会让我忘记地洞存在的故事。看来不只是我，大家都喜欢看那种书中世界的所有地洞都已经加盖的故事，也不知道是不是该叫“杀菌过的故事”。当然主角不会只遇到好事，经历的各种痛苦与难受的体验也不会比别人少，但最终来说，这一切都将成为他成长的动力，让读者可以沉浸在“人就是要接受一切勇敢活下去”这种可靠的感觉中。我说的就是这种故事。<br>&emsp;&emsp;我想我们一定是不希望连在虚构的世界都要经历悲伤<br>&emsp;&emsp;可是有一天，我发现自己不知不觉地身在阴暗的地洞中。那是一种没有任何前兆、没有天理可言的失足。由于那是个非常小且不起眼的地洞，很难指望会有别人帮助。所幸这个地洞并不是深到爬不出来，我花了很长时间，靠自己的力量终于脱身。<br>&emsp;&emsp;来到地上后，我沐浴在久违的温暖阳光与清澈的徐风中，因而产生这样的想法。无论多么小心，都没有人知道何时会掉进地洞。这个世界就是这样的地方。下次我说不定会掉进一个更深的洞，深得让我再也回不到地面上。到时候，我该怎么办呢？<br>&emsp;&emsp;从此之后，我就再也无法怀着以往那样单纯的心情，去看待那些“把地洞加了盖的故事”。相对地，我开始喜欢描写“在地洞里过的好像很幸福的人”的故事。因为我想听的是在阴暗、深邃、狭窄又寒冷的地洞里，不用逞强也能露出微笑的人身上所发生的故事。也许对现在的我来说，再也没有什么比这个更能安慰我了。</p>
+<footer><strong>三秋 缒</strong><cite>いたいのいたいの、とんでゆけ</cite></footer></blockquote>
+]]></content>
+      <tags>
+        <tag>三秋 缒</tag>
+        <tag>摘抄</tag>
+        <tag>小说</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Over the wall</title>
     <url>/2020/12/07/over-the-wall/</url>
     <content><![CDATA[<p>I will record here some information or opinions that I believe.<br>Everything is selected based on my subjective judgment.</p>
@@ -815,20 +829,6 @@ Root&lt;Post&gt; root = query.from(Post<span class="hljs-class">.<span class="hl
 <p>所以，加油！</p>
 </blockquote>
 ]]></content>
-  </entry>
-  <entry>
-    <title>とある三秋 缒の摘抄</title>
-    <url>/2017/05/20/%E3%81%A8%E3%81%82%E3%82%8B%E4%B8%89%E7%A7%8B%20%E7%BC%92%E7%9A%84%E4%B8%80%E4%BA%9B%E6%91%98%E6%8A%84/</url>
-    <content><![CDATA[<p>记录一下比较打动我的一些段落</p>
-<a id="more"></a>
-<blockquote><h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>&emsp;&emsp;这世上到处都有地洞，至少世界看在我眼里就是这样。有的洞小，有的洞大；有的洞浅，有的洞深；有的洞很明显，有的洞不明显；有的洞尚有人掉进去，有的洞已经有许多人掉进去。真的是五花八门。一旦想着这一个个地洞，就会让我满心不安，一步都不想动了。<br>&emsp;&emsp;孩提时代，我喜欢那种会让我忘记地洞存在的故事。看来不只是我，大家都喜欢看那种书中世界的所有地洞都已经加盖的故事，也不知道是不是该叫“杀菌过的故事”。当然主角不会只遇到好事，经历的各种痛苦与难受的体验也不会比别人少，但最终来说，这一切都将成为他成长的动力，让读者可以沉浸在“人就是要接受一切勇敢活下去”这种可靠的感觉中。我说的就是这种故事。<br>&emsp;&emsp;我想我们一定是不希望连在虚构的世界都要经历悲伤<br>&emsp;&emsp;可是有一天，我发现自己不知不觉地身在阴暗的地洞中。那是一种没有任何前兆、没有天理可言的失足。由于那是个非常小且不起眼的地洞，很难指望会有别人帮助。所幸这个地洞并不是深到爬不出来，我花了很长时间，靠自己的力量终于脱身。<br>&emsp;&emsp;来到地上后，我沐浴在久违的温暖阳光与清澈的徐风中，因而产生这样的想法。无论多么小心，都没有人知道何时会掉进地洞。这个世界就是这样的地方。下次我说不定会掉进一个更深的洞，深得让我再也回不到地面上。到时候，我该怎么办呢？<br>&emsp;&emsp;从此之后，我就再也无法怀着以往那样单纯的心情，去看待那些“把地洞加了盖的故事”。相对地，我开始喜欢描写“在地洞里过的好像很幸福的人”的故事。因为我想听的是在阴暗、深邃、狭窄又寒冷的地洞里，不用逞强也能露出微笑的人身上所发生的故事。也许对现在的我来说，再也没有什么比这个更能安慰我了。</p>
-<footer><strong>三秋 缒</strong><cite>いたいのいたいの、とんでゆけ</cite></footer></blockquote>
-]]></content>
-      <tags>
-        <tag>三秋 缒</tag>
-        <tag>摘抄</tag>
-        <tag>小说</tag>
-      </tags>
   </entry>
   <entry>
     <title>将项目部署在docker中</title>
