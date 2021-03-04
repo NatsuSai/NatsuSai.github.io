@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Test</title>
-    <url>/2017/04/20/Demo/</url>
-    <content><![CDATA[<p>test test！！</p>
-<a id="more"></a>
-<h2 id="ACG"><a href="#ACG" class="headerlink" title="ACG"></a>ACG</h2><h3 id="格子裙赛高！"><a href="#格子裙赛高！" class="headerlink" title="格子裙赛高！"></a>格子裙赛高！</h3><p><img src="/COLORS_47646872_p0.jpg" srcset="/img/loading.gif" alt="123"> </p>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872" target="_blank" rel="noopener">カントク - COLORS(id=47646872)</a></p>
-]]></content>
-      <categories>
-        <category>ACG</category>
-      </categories>
-      <tags>
-        <tag>监督</tag>
-        <tag>格子裙</tag>
-        <tag>放学五年目</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Re：从零开始的领域驱动设计</title>
     <url>/2019/08/11/DDD/</url>
     <content><![CDATA[<p>领域驱动设计(Domain-driven design)，缩写为DDD。以领域设计为驱动，构建整一个系统。</p>
@@ -137,6 +120,143 @@
         <tag>CQRS</tag>
         <tag>Event Sourcing</tag>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Test</title>
+    <url>/2017/04/20/Demo/</url>
+    <content><![CDATA[<p>test test！！</p>
+<a id="more"></a>
+<h2 id="ACG"><a href="#ACG" class="headerlink" title="ACG"></a>ACG</h2><h3 id="格子裙赛高！"><a href="#格子裙赛高！" class="headerlink" title="格子裙赛高！"></a>格子裙赛高！</h3><p><img src="/COLORS_47646872_p0.jpg" srcset="/img/loading.gif" alt="123"> </p>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=47646872" target="_blank" rel="noopener">カントク - COLORS(id=47646872)</a></p>
+]]></content>
+      <categories>
+        <category>ACG</category>
+      </categories>
+      <tags>
+        <tag>监督</tag>
+        <tag>格子裙</tag>
+        <tag>放学五年目</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx基础——Rewrite规则</title>
+    <url>/2018/12/30/Nginx%E5%9F%BA%E7%A1%80%E2%80%94%E2%80%94Rewrite%E8%A7%84%E5%88%99/</url>
+    <content><![CDATA[<p>&emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。</p>
+<a id="more"></a>
+<h2 id="正则匹配规则"><a href="#正则匹配规则" class="headerlink" title="正则匹配规则"></a>正则匹配规则</h2><blockquote><p>~  区分大小写匹配<br><del>* 不区分大小写匹配<br>!</del> 和 !~* 区分大小写不匹配及不区分大小写不匹配  </p>
+</blockquote>
+
+<h2 id="文件及目录匹配"><a href="#文件及目录匹配" class="headerlink" title="文件及目录匹配"></a>文件及目录匹配</h2><blockquote><p>-f和!-f 判断是否存在文件<br>-d和!-d 判断是否存在目录<br>-e和!-e 判断是否存在文件或目录<br>-x和!-x 判断文件是否可执行</p>
+</blockquote>
+
+<h2 id="rewrite基本语法"><a href="#rewrite基本语法" class="headerlink" title="rewrite基本语法"></a>rewrite基本语法</h2><div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">set</span>  
+<span class="hljs-keyword">if</span>  
+<span class="hljs-keyword">return</span>
+<span class="hljs-keyword">break</span>
+rewrite</code></pre></div>
+
+<h3 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h3><blockquote><p>使用范围：server，location，if;  </p>
+</blockquote> 
+
+<p>中断当前相同作用域的其他nginx配置。 </p>
+<h3 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h3><blockquote><p>使用范围：server，location  </p>
+</blockquote> 
+
+<p>检查一个条件是否符合。If指令不支持嵌套，不支持多个条件&amp;&amp;和||处理。</p>
+<h3 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h3><blockquote><p>格式：return code ;<br>使用范围：server，location，if;</p>
+</blockquote> 
+
+<p>结束规则的执行并返回状态码给客户端。</p>
+<h3 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h3><blockquote><p>使用环境：server，location，if  </p>
+</blockquote> 
+
+<p>定义一个变量，并给变量赋值。变量的值可以为文本、变量或者变量的组合。</p>
+<div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">set</span> <span class="hljs-variable">$var</span> <span class="hljs-string">"hello world"</span></code></pre></div>
+
+<h2 id="rewrite指令格式"><a href="#rewrite指令格式" class="headerlink" title="rewrite指令格式"></a>rewrite指令格式</h2><div class="hljs"><pre><code>rewrite regex replacement [flag]</code></pre></div><p>flag标志位有四种：</p>
+<blockquote><p>break：停止rewrite检测,也就是说当含有break flag的rewrite语句被执行时,该语句就是rewrite的最终结果。<br>last：停止rewrite检测,但是跟break有本质的不同,last的语句不一定是最终结果。<br>redirect：返回302临时重定向，一般用于重定向到完整的URL(包含http:部分)<br>permanent：返回301永久重定向，一般用于重定向到完整的URL(包含http:部分) </p>
+</blockquote> 
+
+<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><p>当访问的文件和目录不存在时，重定向到某个php文件</p>
+<div class="hljs"><pre><code class="hljs ">if( !-e $request_filename )
+&#123;
+    rewrite ^/(.*)$ <span class="hljs-keyword">index</span>.php <span class="hljs-keyword">last</span>;
+&#125;</code></pre></div>
+
+<p>目录对换 /123456/xxxx ====&gt; /xxxx?id=123456</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(\d+)/(.+)/</span>  /<span class="hljs-variable">$2</span>?id=<span class="hljs-variable">$1</span> <span class="hljs-literal">last</span>;</code></pre></div>
+
+<p>如果客户端使用的是IE浏览器，则重定向到/ie目录下</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">if</span>( <span class="hljs-variable">$http_user_agent</span> ~ MSIE)
+&#123;
+    rewrite ^(.*)$ <span class="hljs-regexp">/ie/</span><span class="hljs-variable">$1</span> <span class="hljs-keyword">break</span>;
+&#125;</code></pre></div>
+
+<p>禁止访问以/data开头的文件</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">location</span> <span class="hljs-title">~ ^/data</span>
+&#123;
+    <span class="hljs-keyword">deny</span> all;
+&#125;</code></pre></div>
+
+<p>禁止访问以.sh，.flv，.mp3为文件后缀名的文件</p>
+<div class="hljs"><pre><code class="hljs ">location ~ .*\.(sh|<span class="hljs-type">flv</span>|<span class="hljs-type">mp3</span>)$
+&#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">403</span>;
+&#125;</code></pre></div>
+
+<p>设置某些类型文件的浏览器缓存时间</p>
+<div class="hljs"><pre><code class="hljs ">location ~ .*\.(gif|<span class="hljs-type">jpg</span>|<span class="hljs-type">jpeg</span>|<span class="hljs-type">png</span>|<span class="hljs-type">bmp</span>|<span class="hljs-type">swf</span>)$
+&#123;
+    expires <span class="hljs-number">30</span>d;
+&#125;</code></pre></div>
+
+<p>文件反盗链并设置过期时间</p>
+<div class="hljs"><pre><code class="hljs ">location ~*^.+\.(jpg<span class="hljs-params">|jpeg|</span>gif<span class="hljs-params">|png|</span>swf<span class="hljs-params">|rar|</span>zip<span class="hljs-params">|css|</span>js)$ 
+&#123;
+    valid_referers none blocked *.linuxidc.com*.linuxidc.net localhost <span class="hljs-number">208.97</span>.<span class="hljs-number">167.194</span>;
+    <span class="hljs-keyword">if</span> ($invalid_referer) &#123;
+        rewrite ^<span class="hljs-regexp">/ http:/</span><span class="hljs-regexp">/img.linuxidc.net/leech</span>.gif;
+        <span class="hljs-keyword">return</span> <span class="hljs-number">412</span>;
+        <span class="hljs-keyword">break</span>;
+    &#125;
+    access_log  off;
+    root /opt/lampp/htdocs/web;
+    expires <span class="hljs-number">3</span>d;
+    <span class="hljs-keyword">break</span>;
+&#125;</code></pre></div>
+
+<p>将多级目录下的文件转成一个文件，增强seo效果</p>
+<div class="hljs"><pre><code class="hljs ">  
+/job<span class="hljs-number">-123</span><span class="hljs-number">-456</span><span class="hljs-number">-789.</span>html 指向/job/<span class="hljs-number">123</span>/<span class="hljs-number">456</span>/<span class="hljs-number">789.</span>html
+
+rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)\.html$ /job/$<span class="hljs-number">1</span>/$<span class="hljs-number">2</span>/jobshow_$<span class="hljs-number">3.</span>html last;</code></pre></div>
+
+<p>域名跳转</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-section">server</span>
+&#123;
+    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+    <span class="hljs-attribute">server_name</span> jump.linuxidc.com;
+    <span class="hljs-attribute">index</span> index.html index.htm index.php;
+    <span class="hljs-attribute">root</span> /opt/lampp/htdocs/www;
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/</span> http://www.linuxidc.com/;
+    <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;
+&#125;</code></pre></div>
+
+<p>多域名转向</p>
+<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">server_name</span> www.linuxidc.comwww.linuxidc.net;
+<span class="hljs-attribute">index</span> index.html index.htm index.php;
+<span class="hljs-attribute">root</span>  /opt/lampp/htdocs;
+<span class="hljs-attribute">if</span> (<span class="hljs-variable">$host</span> <span class="hljs-regexp">~ "linuxidc\.net")</span> &#123;
+    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)</span> http://www.linuxidc.com<span class="hljs-variable">$1</span>permanent;
+&#125;</code></pre></div>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
@@ -562,126 +682,6 @@ main
         <tag>ORM</tag>
         <tag>JPA</tag>
         <tag>Hibernate</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx基础——Rewrite规则</title>
-    <url>/2018/12/30/Nginx%E5%9F%BA%E7%A1%80%E2%80%94%E2%80%94Rewrite%E8%A7%84%E5%88%99/</url>
-    <content><![CDATA[<p>&emsp;&emsp;rewrite是nginx一个特别重要的指令，该指令可以使用正则表达式改写URI。可以指定一个或多个rewrite指令，按顺序匹配。</p>
-<a id="more"></a>
-<h2 id="正则匹配规则"><a href="#正则匹配规则" class="headerlink" title="正则匹配规则"></a>正则匹配规则</h2><blockquote><p>~  区分大小写匹配<br><del>* 不区分大小写匹配<br>!</del> 和 !~* 区分大小写不匹配及不区分大小写不匹配  </p>
-</blockquote>
-
-<h2 id="文件及目录匹配"><a href="#文件及目录匹配" class="headerlink" title="文件及目录匹配"></a>文件及目录匹配</h2><blockquote><p>-f和!-f 判断是否存在文件<br>-d和!-d 判断是否存在目录<br>-e和!-e 判断是否存在文件或目录<br>-x和!-x 判断文件是否可执行</p>
-</blockquote>
-
-<h2 id="rewrite基本语法"><a href="#rewrite基本语法" class="headerlink" title="rewrite基本语法"></a>rewrite基本语法</h2><div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">set</span>  
-<span class="hljs-keyword">if</span>  
-<span class="hljs-keyword">return</span>
-<span class="hljs-keyword">break</span>
-rewrite</code></pre></div>
-
-<h3 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h3><blockquote><p>使用范围：server，location，if;  </p>
-</blockquote> 
-
-<p>中断当前相同作用域的其他nginx配置。 </p>
-<h3 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h3><blockquote><p>使用范围：server，location  </p>
-</blockquote> 
-
-<p>检查一个条件是否符合。If指令不支持嵌套，不支持多个条件&amp;&amp;和||处理。</p>
-<h3 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h3><blockquote><p>格式：return code ;<br>使用范围：server，location，if;</p>
-</blockquote> 
-
-<p>结束规则的执行并返回状态码给客户端。</p>
-<h3 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h3><blockquote><p>使用环境：server，location，if  </p>
-</blockquote> 
-
-<p>定义一个变量，并给变量赋值。变量的值可以为文本、变量或者变量的组合。</p>
-<div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">set</span> <span class="hljs-variable">$var</span> <span class="hljs-string">"hello world"</span></code></pre></div>
-
-<h2 id="rewrite指令格式"><a href="#rewrite指令格式" class="headerlink" title="rewrite指令格式"></a>rewrite指令格式</h2><div class="hljs"><pre><code>rewrite regex replacement [flag]</code></pre></div><p>flag标志位有四种：</p>
-<blockquote><p>break：停止rewrite检测,也就是说当含有break flag的rewrite语句被执行时,该语句就是rewrite的最终结果。<br>last：停止rewrite检测,但是跟break有本质的不同,last的语句不一定是最终结果。<br>redirect：返回302临时重定向，一般用于重定向到完整的URL(包含http:部分)<br>permanent：返回301永久重定向，一般用于重定向到完整的URL(包含http:部分) </p>
-</blockquote> 
-
-<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><p>当访问的文件和目录不存在时，重定向到某个php文件</p>
-<div class="hljs"><pre><code class="hljs ">if( !-e $request_filename )
-&#123;
-    rewrite ^/(.*)$ <span class="hljs-keyword">index</span>.php <span class="hljs-keyword">last</span>;
-&#125;</code></pre></div>
-
-<p>目录对换 /123456/xxxx ====&gt; /xxxx?id=123456</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/(\d+)/(.+)/</span>  /<span class="hljs-variable">$2</span>?id=<span class="hljs-variable">$1</span> <span class="hljs-literal">last</span>;</code></pre></div>
-
-<p>如果客户端使用的是IE浏览器，则重定向到/ie目录下</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">if</span>( <span class="hljs-variable">$http_user_agent</span> ~ MSIE)
-&#123;
-    rewrite ^(.*)$ <span class="hljs-regexp">/ie/</span><span class="hljs-variable">$1</span> <span class="hljs-keyword">break</span>;
-&#125;</code></pre></div>
-
-<p>禁止访问以/data开头的文件</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-keyword">location</span> <span class="hljs-title">~ ^/data</span>
-&#123;
-    <span class="hljs-keyword">deny</span> all;
-&#125;</code></pre></div>
-
-<p>禁止访问以.sh，.flv，.mp3为文件后缀名的文件</p>
-<div class="hljs"><pre><code class="hljs ">location ~ .*\.(sh|<span class="hljs-type">flv</span>|<span class="hljs-type">mp3</span>)$
-&#123;
-    <span class="hljs-keyword">return</span> <span class="hljs-number">403</span>;
-&#125;</code></pre></div>
-
-<p>设置某些类型文件的浏览器缓存时间</p>
-<div class="hljs"><pre><code class="hljs ">location ~ .*\.(gif|<span class="hljs-type">jpg</span>|<span class="hljs-type">jpeg</span>|<span class="hljs-type">png</span>|<span class="hljs-type">bmp</span>|<span class="hljs-type">swf</span>)$
-&#123;
-    expires <span class="hljs-number">30</span>d;
-&#125;</code></pre></div>
-
-<p>文件反盗链并设置过期时间</p>
-<div class="hljs"><pre><code class="hljs ">location ~*^.+\.(jpg<span class="hljs-params">|jpeg|</span>gif<span class="hljs-params">|png|</span>swf<span class="hljs-params">|rar|</span>zip<span class="hljs-params">|css|</span>js)$ 
-&#123;
-    valid_referers none blocked *.linuxidc.com*.linuxidc.net localhost <span class="hljs-number">208.97</span>.<span class="hljs-number">167.194</span>;
-    <span class="hljs-keyword">if</span> ($invalid_referer) &#123;
-        rewrite ^<span class="hljs-regexp">/ http:/</span><span class="hljs-regexp">/img.linuxidc.net/leech</span>.gif;
-        <span class="hljs-keyword">return</span> <span class="hljs-number">412</span>;
-        <span class="hljs-keyword">break</span>;
-    &#125;
-    access_log  off;
-    root /opt/lampp/htdocs/web;
-    expires <span class="hljs-number">3</span>d;
-    <span class="hljs-keyword">break</span>;
-&#125;</code></pre></div>
-
-<p>将多级目录下的文件转成一个文件，增强seo效果</p>
-<div class="hljs"><pre><code class="hljs ">  
-/job<span class="hljs-number">-123</span><span class="hljs-number">-456</span><span class="hljs-number">-789.</span>html 指向/job/<span class="hljs-number">123</span>/<span class="hljs-number">456</span>/<span class="hljs-number">789.</span>html
-
-rewrite^/job-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)-([<span class="hljs-number">0</span><span class="hljs-number">-9</span>]+)\.html$ /job/$<span class="hljs-number">1</span>/$<span class="hljs-number">2</span>/jobshow_$<span class="hljs-number">3.</span>html last;</code></pre></div>
-
-<p>域名跳转</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-section">server</span>
-&#123;
-    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
-    <span class="hljs-attribute">server_name</span> jump.linuxidc.com;
-    <span class="hljs-attribute">index</span> index.html index.htm index.php;
-    <span class="hljs-attribute">root</span> /opt/lampp/htdocs/www;
-    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^/</span> http://www.linuxidc.com/;
-    <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;
-&#125;</code></pre></div>
-
-<p>多域名转向</p>
-<div class="hljs"><pre><code class="hljs "><span class="hljs-attribute">server_name</span> www.linuxidc.comwww.linuxidc.net;
-<span class="hljs-attribute">index</span> index.html index.htm index.php;
-<span class="hljs-attribute">root</span>  /opt/lampp/htdocs;
-<span class="hljs-attribute">if</span> (<span class="hljs-variable">$host</span> <span class="hljs-regexp">~ "linuxidc\.net")</span> &#123;
-    <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^(.*)</span> http://www.linuxidc.com<span class="hljs-variable">$1</span>permanent;
-&#125;</code></pre></div>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>Nginx</tag>
-        <tag>转载</tag>
       </tags>
   </entry>
   <entry>
