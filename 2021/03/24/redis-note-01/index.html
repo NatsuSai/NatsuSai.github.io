@@ -174,7 +174,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      940 字
+      1k 字
     </span>
   
 
@@ -184,7 +184,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      10
+      11
        分钟
     </span>
   
@@ -218,13 +218,16 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body" id="post-body">
               <p>使用Redis时有时候会碰上一些并发的问题，这里来说一下分布式锁以及加锁超时等问题。</p>
 <a id="more"></a>
+<blockquote>
+<p>封面<br>一天在某神社（？）看到的。非常向往这种中世纪风格，可能是因为《狼与香辛料》或者大多那种<br>剑与魔法的世界，都在这样的时代吧，让我觉得特别浪漫。</p>
+</blockquote>
 <h3 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h3><p>一般情况下，会对那些变化不大但是访问量比较大的请求做缓存处理，但缓存会在某个时刻失效，<br>此时就会有大量的请求涌向数据库从而容易引发雪崩效果。</p>
 <h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>为了避免雪崩，我们可以在更新缓存的代码块（即访问数据库）中加入分布式锁，只能够让一个线程去做缓存更新:</p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">if</span> (redis.setIfAbsent(<span class="hljs-keyword">lock</span>, <span class="hljs-number">1</span>)) &#123; 
