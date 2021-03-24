@@ -16,7 +16,7 @@
   <meta name="description" content="君を見てると、心が震える">
   <meta name="author" content="Kurenai">
   <meta name="keywords" content>
-  <title>Over the wall - Kurenai&#39;s World</title>
+  <title>Redis笔记01 - Kurenai&#39;s World</title>
 
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css">
 
@@ -145,14 +145,14 @@
 </nav>
 
     <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/gallery/Lain.JPG') no-repeat center center;
+         style="background: url('/gallery/machi.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="container page-header text-center fade-in-up">
             <span class="h2" id="subtitle">
               
-                Over the wall
+                Redis笔记01
               
             </span>
 
@@ -162,8 +162,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-07 01:48" pubdate>
-        2020年12月7日 凌晨
+      <time datetime="2021-03-24 09:18" pubdate>
+        2021年3月24日 上午
       </time>
     </span>
   
@@ -174,7 +174,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.9k 字
+      940 字
     </span>
   
 
@@ -184,7 +184,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      19
+      10
        分钟
     </span>
   
@@ -214,7 +214,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto" id="post">
             <!-- SEO header -->
-            <h1 style="display: none">Over the wall</h1>
+            <h1 style="display: none">Redis笔记01</h1>
             
               <p class="note note-info">
                 
@@ -223,41 +223,82 @@
               </p>
             
             <div class="markdown-body" id="post-body">
-              <p>I will record here some information or opinions that I believe.<br>Everything is selected based on my subjective judgment.</p>
+              <p>使用Redis时有时候会碰上一些并发的问题，这里来说一下分布式锁以及加锁超时等问题。</p>
 <a id="more"></a>
+<h3 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h3><p>一般情况下，会对那些变化不大但是访问量比较大的请求做缓存处理，但缓存会在某个时刻失效，<br>此时就会有大量的请求涌向数据库从而容易引发雪崩效果。</p>
+<h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>为了避免雪崩，我们可以在更新缓存的代码块（即访问数据库）中加入分布式锁，只能够让一个线程去做缓存更新:</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">if</span> (redis.setIfAbsent(<span class="hljs-keyword">lock</span>, <span class="hljs-number">1</span>)) &#123; 
+    <span class="hljs-comment">// 更新缓存逻辑</span>
+    redis.del(<span class="hljs-keyword">lock</span>)<span class="hljs-comment">;</span>
+&#125;</code></pre></div>
+
+<p>但是上面如果更新逻辑出现卡死现象就会造成死锁，所以我们还需要给锁设置超时时间，<br>但是设置超时时间一般的工具例如spring的RedisTemplate是没有把检查存在并设置值和设置超时时间<br>作为一个请求发送的，则无法保证是原子操作，这样也会发生在设置超时时间的时候没有成功导致死锁。  </p>
+<p>由于redis新版本支持了setNX和EX复合指令的原子操作（即判断存在和设置超时时间），<br>所以我们可以去扩展RedisTemplate或者当前使用的工具类；另一种方法则是用lua脚本，执行lua脚本也是一次原子操作。</p>
 <blockquote>
-<p>封面 我的头像出处，《Lian》当中的女主铃音，头像以及本封面都是碟子附赠的图片。片子非常意识流，那种感觉就像第一次看 eva 一样，有点跟不上节奏，或者说觉得非常混沌。</p>
+<p>redis在4.0之前整体都是单线程的，4.0后开始加入多线程，但也仅是部分操作，<br>所以就算非复合指令也可以通过一个请求发送多个指令的方式来达成原子操作的目的。</p>
 </blockquote>
-<hr>
-<p><a href="https://www.v2ex.com/t/689630?p=1#r_9241365" target="_blank" rel="noopener">Link</a></p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">if</span> (redis.setAndExpireIfAbsent(<span class="hljs-keyword">lock</span>, <span class="hljs-number">1</span>, <span class="hljs-number">10000</span>)) &#123; 
+    <span class="hljs-comment">// 更新缓存逻辑</span>
+    redis.del(<span class="hljs-keyword">lock</span>)<span class="hljs-comment">;</span>
+&#125;</code></pre></div>
+
 <blockquote>
-<p>首先，把移民和工作分开：很多人移民了还是要辛苦工作<br>其次，把移民和 “改变命运” 这件事分开：很多人移民了并没有太大的改命<br>然后，把移民和与众不同这件事分开：很多比你条件差的人也成功了<br>然后，把移民和鹤立鸡群这件事分开：即使你移民成功了别人也未必羡慕<br>然后，把移民和生活中任何一件事联系起来：它就像任何一次部门间的工作调动一样平常，组织捞人 捞到你了，组织说让你去海外你就去了，就完事了（和你的个人素质并无关系：比你的英文水平好很多的人，其实也没移民；比你 IT 能力再高的人，其实也没移民；怎么就论到你移民了呢？是的，就是轮到你了。）</p>
-<p>并不高不可攀，甚至就像喝水</p>
-<p>然后，你会发现 V2EX 其实并不是一个特别适合讨论移民这件事的 BBS，尤其是在增强移民信心和让移民可行性落地的方面：盖因它无法像讨论一件普普通通的事情一样讨论移民，它没这心胸。</p>
+<p>注意<br>redis 2.6.12 之前，set返回永远为ok，之后则设置成功时返回ok，<br>加入条件参数不成立则返回空</p>
 </blockquote>
-<p><a href="https://www.v2ex.com/t/731552?p=2#r_9874141" target="_blank" rel="noopener">Link</a></p>
-<blockquote>
-<p>不想反驳一些人的观点，毕竟每个人都有表达自己观点的权利。</p>
-<p>但是，作为一个个体，你需要明确：</p>
-<p>1 、你的一辈子很短，你必须优先考虑眼前的幸福，而不是未来潜在的幸福。比如，我承认中国在改善、在发展，但是在可见的未来几十年，许多问题依然不会得到解决（ e.g.建立独立的司法体系、健全对弱势群体的保护）。这是一个价值观选择题：你选择去伟大地建设这个国家，还是优先保护自己和家人？很遗憾，我比较自私，我也不是伟人，我选择短期内更能保护我个人利益（ e.g.有健全的劳动法、有工会、可以自由访问互联网并且自由交流思想）的地方。</p>
-<p>2 、国家是一个政治概念，是一个“协议”、“合同”，而不是一种与生俱来的强加于个体的道德义务。有兴趣的可以参考这里的讨论： <a href="https://www.zhihu.com/question/48440859" target="_blank" rel="noopener">https://www.zhihu.com/question/48440859</a> 。所以，不要被这种政治概念和集体思想绑架，否则你就是韭菜——或者你是站在有资源的那一边，可以利用这个概念去绑架别人、割别人韭菜。</p>
-<p>3 、移民与否，取决于你在哪里更有优势、能活得更好。我认识的大部分回国的同学，都是在国内非富即贵的。我想了想，似乎非常合理：因为他们回去可以轻而易举地活得很好甚至随意割别人韭菜。如果你也是有本事割别人韭菜的，那就留在国内，毕竟国内机会比较多。但是如果你不属于这种，那么就想想你最在乎什么（ e.g.钱？健康？生活丰富度？稳定性？冒险刺激？相对公平的允许你靠自身努力上升的发展平台？）、如果去国外你是不是可以活得更开心（ e.g.哪些地方可以提供你在乎的这些东西）？</p>
-<p>没有一个国家是完美的，日韩、欧洲、美国、新加坡都有各自的问题（日韩-经济并不是很好、并不是未来的主流市场、发展上限较低；欧洲-经济也不是特别好，除了德国英国稍微好点；美国-在太平洋两岸两位书记的联手协作下，民粹主义盛行；新加坡-主要产业为金融服务业，没有太多 tech 行业的机会）。如果你想追求刺激、追求暴富，那么可能中国更适合你。</p>
-<p>但是国内也有国内的问题——e.g.摘取 11 例器官判 2 年 4 个月，写小黄书判 10 年半； 996 是常态；弱势群体随时有可能被“集体”绑架和以“维护集体利益”的名义牺牲。坦白说，中国虽然近年经济发展迅速，但是在对国民个体的保护上与西方国家还差着一整个“文艺复兴”（西方所有价值观的基础——“以人为本、破除神权”）。如果你觉得自己是一个弱势群体，那么可能中国对你来说就是 hard 模式。</p>
-<p>最后，再次非常诚恳地建议很多和我一样的“弱势群体”，不要被别人割了韭菜，还帮着人家吆喝。保护好自己和家人、健康快乐地过好自己短暂的一生，这才是最重要的、这也是作为一个人的基本天性和权利—— [身为韭菜，不要自己给自己画饼] 。</p>
-</blockquote>
-<p><a href="https://www.v2ex.com/t/731552?p=2#r_9874150" target="_blank" rel="noopener">Link</a> </p>
-<blockquote>
-<p>另外关于移民途径，似乎现在还是挺多的——人口减少是许多发达国家面临的巨大挑战，所以只要你年轻还是有很多机会的。全球发达国家中似乎只有美国是移民非常难的。</p>
-<p>1 、加拿大——读书、拿工作签、枫叶卡；甚至如果不去加拿大读书和工作也可以直接申请枫叶卡，只要你打分足够——年纪轻加分、高学历加分、工作经验加分（自行搜索加拿大移民 Express Entry 打分系统）；<br>2 、新加坡——只要能找到工作就能申请到工作签和之后申请绿卡，没有名额限制。位于新加坡的 tech 公司虽然不多，但还是有几家，之前在 v 站也看到过相关的招人贴，请自行搜索；<br>3 、欧洲——只要能找到工作，就能申请到工作签并且之后申请绿卡，无名额限制。但是直接找欧洲工作比较难找，因为欧洲人自己找工作本身就比较难了（尤其是英国，暂且还是把英国算在欧洲吧 lol ）。加入国际公司再申请内部 relocation 的思路比较有实操意义，前提是你能说服老板为什么要 relocate 。要么就还是读书、工作签、申请绿卡，也不是很难。<br>4 、美国——除非能直接找到工作并且申请到 H1B，或者加入在华美国公司一年后以 L1 签证调来美国；要么就是读书、找工作、申请 H1B 、申请绿卡；要么就是投资移民、结婚移民等途径了。<br>5 、日韩——不清楚，按理说也不会很难。  </p>
-<p>途径还是一直有的，就看你愿不愿意冒险和花成本了。经济上，我之前也见过许多国际学生贷款来读书的——可能国内觉得不可思议，但是美国挺常见的，如果你读 MBA 或者 JD 或者 STEM 这种未来赚钱能力强的学位，无需美国人担保即可贷款，请自行搜索 Prodigy Finance 。学校申请上，你如果是为了找工作，未必一定要申请顶尖名校，找工作够用就行。</p>
-<p>所以，加油！</p>
-</blockquote>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>但我们可能还会发现另一个问题，更新逻辑太久了超过了超时时间，此时锁已经被解除了，<br>这就会执行导致途中另一个线程获取到了锁，导致后面删除的时候是删除的另一个线程加的锁。  </p>
+<p>所以我们需要引入一个随机id，作为当前线程加锁的标识，若后面发现不是相同id则不做删除。</p>
+<div class="hljs"><pre><code class="hljs undefined">long <span class="hljs-built_in">random</span> = SnowFlakeGenerator.getInstant().nextId();
+<span class="hljs-keyword">if</span> (redis.setAndExpireIfAbsent(<span class="hljs-built_in">lock</span>, <span class="hljs-built_in">random</span>, <span class="hljs-number">10000</span>)) &#123; 
+    <span class="hljs-comment">// 更新缓存逻辑</span>
+    <span class="hljs-keyword">if</span> (redis.get(<span class="hljs-built_in">lock</span>) == <span class="hljs-built_in">random</span>) &#123;
+        redis.del(<span class="hljs-built_in">lock</span>);
+    &#125;
+&#125;</code></pre></div>
+
+<p>Ok，到了这里你可能也发现了，这个删除是不是也要做原子操作比较好点(<br>没错…<br>若是不做原子操作，那可能就会虽然拿到锁的值能够匹配上，但是下一个瞬间就因为超时而被别的其他线程获取到锁<br>从而又引发了上面的问题，删错了别的线程的锁。</p>
+<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>类似的由于超时导致的问题还有一些情况就是计数器</p>
+<div class="hljs"><pre><code class="hljs undefined">synchronized (LOCK) &#123; <span class="hljs-comment">//只是为了排除多线程情况，这里只想讨论超时问题，实际情况还要具体分析</span>
+    <span class="hljs-keyword">if</span>(redis.exists(userId)) &#123;
+        redis.incr();
+        <span class="hljs-keyword">if</span> (redis.<span class="hljs-keyword">get</span>(userId) &gt; maxAllowedTimes) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        redis.<span class="hljs-keyword">set</span>(userId, <span class="hljs-number">1</span>);
+        redis.setExpire(<span class="hljs-number">60000</span>);
+        <span class="hljs-keyword">return</span> ture;
+    &#125;
+&#125;</code></pre></div>
+
+<p>上面是一段限制用户一分钟内可访问次数的redis计数器。<br>这里面如果判断到存在后的下一个瞬间恰好超时，此时incr方法在redis的行为就是先创建并设置值为0，然后加1，<br>而没有设置过期时间。导致后面永远被限制访问。  </p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">synchronized</span> (LOCK) &#123;
+ 
+    <span class="hljs-keyword">if</span>(redis.setAndExpireIfAbsent(userId, <span class="hljs-number">1</span>, <span class="hljs-number">60000</span>)) &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-keyword">long</span> <span class="hljs-keyword">times</span> = redis.get(userId);
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">times</span> &lt; maxAllowedTimes) &#123;
+            redis.setIfPresent(userId, ++<span class="hljs-keyword">times</span>);
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    &#125;
+&#125;</code></pre></div>
+
+
 
             </div>
             <hr>
             <div>
               <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Redis/">Redis</a>
+                    
+                  </div>
                 
                 
               </div>
@@ -269,18 +310,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/03/24/redis-note-01/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis笔记01</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2020/10/06/learning-jpa-02/">
-                        <span class="hidden-mobile">学习JPA笔记——构建复杂查询</span>
+                      <a href="/2020/12/07/over-the-wall/">
+                        <span class="hidden-mobile">Over the wall</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
