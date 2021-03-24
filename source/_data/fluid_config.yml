@@ -270,7 +270,7 @@ post:  # 部分配置同时控制自定义页面，注意备注
 # utterances
 # You can install utterances with https://utteranc.es/ and generate your configuration
 utterances:
-  repo: NatsuSai/commit-utterances
+  repo: KurenaiRyu/commit-utterances
   issue_term: title
   label: ✨💬✨
   theme: github-light
