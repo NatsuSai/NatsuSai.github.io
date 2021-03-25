@@ -82,17 +82,45 @@ synchronized (LOCK) { //只是为了排除多线程情况，这里只想讨论�
 ```
 synchronized (LOCK) {
  
-    if(redis.setAndExpireIfAbsent(userId, 1, 60000)) {
+    if(redis.exists(userId)) {
+        long count = (long) redis.incr(userId);
+        
+        if(redis.ttl(userId) == -1) {
+            redis.setExpire(60000);
+        }
+        if (count > maxAllowedTimes) {
+            return false;
+        }
         return true;
     } else {
-        long times = redis.get(userId);
-        if(times < maxAllowedTimes) {
-            redis.setIfPresent(userId, ++times);
-            return true;
-        }
-        return false;
+        redis.setEx(userId, 60000, 1);//设置1并设置超时时间60000
+        return ture;
     }
 }
 ```
+> ttl  
+> -2 表示key不存在  
+> -1 表示key存在但是没有过期时间  
+
+另外一种解决办法就是取当前时间(或者是减去某个时间后)的秒数，然后再去除以60(时间周期)，
+这样就能够获的一个周期数(第几个周期)，将其拼接在key上，则能够避免删错或者是没有设置超时时间的问题了。
+```
+synchronized (LOCK) {
+    long times = time.times()//假设这是获取当前时间秒数的工具类
+    // COUNTER_INTERVAL 时间周期
+    String key = "ACCESS_COUNT:" + times/COUNTER_INTERVAL + ":" + userId 
+    if(redis.exists(key)) {
+        long count = (long) redis.incr(key);
+        if (count > maxAllowedTimes) {
+            return false;
+        }
+        return true;
+    } else {
+        redis.setEx(key, 60000, 1);//设置1并设置超时时间60000
+        return ture;
+    }
+}
+```
+
   
   
