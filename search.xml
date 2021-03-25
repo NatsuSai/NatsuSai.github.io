@@ -873,15 +873,39 @@ Root&lt;Post&gt; root = query.from(Post<span class="hljs-class">.<span class="hl
 <p>上面是一段限制用户一分钟内可访问次数的redis计数器。<br>这里面如果判断到存在后的下一个瞬间恰好超时，此时incr方法在redis的行为就是先创建并设置值为0，然后加1，<br>而没有设置过期时间。导致后面永远被限制访问。  </p>
 <div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">synchronized</span> (LOCK) &#123;
  
-    <span class="hljs-keyword">if</span>(redis.setAndExpireIfAbsent(userId, <span class="hljs-number">1</span>, <span class="hljs-number">60000</span>)) &#123;
+    <span class="hljs-keyword">if</span>(redis.exists(userId)) &#123;
+        <span class="hljs-keyword">long</span> <span class="hljs-keyword">count</span> = (<span class="hljs-keyword">long</span>) redis.incr(userId);
+        
+        <span class="hljs-keyword">if</span>(redis.ttl(userId) == -<span class="hljs-number">1</span>) &#123;
+            redis.setExpire(<span class="hljs-number">60000</span>);
+        &#125;
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">count</span> &gt; maxAllowedTimes) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
     &#125; <span class="hljs-keyword">else</span> &#123;
-        <span class="hljs-keyword">long</span> <span class="hljs-keyword">times</span> = redis.get(userId);
-        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">times</span> &lt; maxAllowedTimes) &#123;
-            redis.setIfPresent(userId, ++<span class="hljs-keyword">times</span>);
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        redis.setEx(userId, <span class="hljs-number">60000</span>, <span class="hljs-number">1</span>);<span class="hljs-comment">//设置1并设置超时时间60000</span>
+        <span class="hljs-keyword">return</span> ture;
+    &#125;
+&#125;</code></pre></div>
+
+<blockquote>
+<p>ttl<br>-2 表示key不存在<br>-1 表示key存在但是没有过期时间  </p>
+</blockquote>
+<p>另外一种解决办法就是取当前时间(或者是减去某个时间后)的秒数，然后再去除以60(时间周期)，<br>这样就能够获的一个周期数(第几个周期)，将其拼接在key上，则能够避免删错或者是没有设置超时时间的问题了。</p>
+<div class="hljs"><pre><code class="hljs undefined"><span class="hljs-keyword">synchronized</span> (LOCK) &#123;
+    <span class="hljs-keyword">long</span> times = time.times()<span class="hljs-comment">//假设这是获取当前时间秒数的工具类</span>
+    <span class="hljs-comment">// COUNTER_INTERVAL 时间周期</span>
+    <span class="hljs-keyword">String</span> <span class="hljs-built_in">key</span> = <span class="hljs-string">"ACCESS_COUNT:"</span> + times/COUNTER_INTERVAL + <span class="hljs-string">":"</span> + userId 
+    <span class="hljs-keyword">if</span>(redis.exists(<span class="hljs-built_in">key</span>)) &#123;
+        <span class="hljs-keyword">long</span> count = (<span class="hljs-keyword">long</span>) redis.incr(<span class="hljs-built_in">key</span>);
+        <span class="hljs-keyword">if</span> (count &gt; maxAllowedTimes) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
         &#125;
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+        redis.setEx(<span class="hljs-built_in">key</span>, <span class="hljs-number">60000</span>, <span class="hljs-number">1</span>);<span class="hljs-comment">//设置1并设置超时时间60000</span>
+        <span class="hljs-keyword">return</span> ture;
     &#125;
 &#125;</code></pre></div>
 
