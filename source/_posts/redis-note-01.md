@@ -2,7 +2,7 @@
 title: Redis笔记01
 date: 2021-03-24 09:18:07
 categories:
-    - Redis
+    - 编程
 hide: false
 comments: true
 index_img: /gallery/machi.png

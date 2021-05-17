@@ -2,7 +2,7 @@
 title: 学习JPA笔记——使用MetaModel实现Typesafe
 date: 2020-10-06 07:25:51
 categories: 
-    - Java
+    - 编程
 tags:
     - Java
     - ORM

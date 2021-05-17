@@ -2,7 +2,7 @@
 title: 学习JPA笔记——构建复杂查询
 date: 2020-10-06 09:25:19
 categories: 
-    - Java
+    - 编程
 tags:
     - Java
     - ORM
