@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>面试题笔记01</title>
+    <link href="/2021/05/17/interview-note-01/"/>
+    <url>/2021/05/17/interview-note-01/</url>
+    
+    <content type="html"><![CDATA[<p>记录一下看过的一些面试题。</p><a id="more"></a><blockquote><p>封面<br>这位画师的脸以及上色很有特点，稍微留意一下很容易就能够辨别出来了，只是表情总给人一种同样的感觉w<br><a href="https://twitter.com/__LM7__/status/1379416474293465090" target="_blank" rel="noopener">https://twitter.com/__LM7__/status/1379416474293465090</a></p></blockquote><h2 id="MQ接收到消息后无法查询到或者是旧的状态"><a href="#MQ接收到消息后无法查询到或者是旧的状态" class="headerlink" title="MQ接收到消息后无法查询到或者是旧的状态"></a>MQ接收到消息后无法查询到或者是旧的状态</h2><p>原因</p><ul><li>数据库回滚  </li><li>数据库事务未提交</li></ul><p>解决办法</p><ul><li><p>可以尝试将mq放在数据库事务之后执行。</p></li><li><p>可以利用@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)监听spring事务afterCommit阶段。</p>  <div class="hljs"><pre><code class="hljs java"><span class="hljs-meta">@Transactional</span><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">saveFoo</span><span class="hljs-params">(FooEntity fooEntity)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;    log.error(<span class="hljs-string">"start insert foo"</span>);    fooRepository.save(fooEntity);    publisher.publishEvent(<span class="hljs-keyword">new</span> MyTransactionEvent(fooEntity.getFooName()));    log.error(<span class="hljs-string">"end insert foo"</span>);    Thread.currentThread().sleep(<span class="hljs-number">2000</span>);    log.error(<span class="hljs-string">"to commit insert"</span>);    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;&#125;<span class="hljs-meta">@TransactionalEventListener</span>(phase = TransactionPhase.AFTER_COMMIT)<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">afterCommit</span><span class="hljs-params">(MyTransactionEvent event)</span> </span>&#123;    log.error(<span class="hljs-string">"after commit then send event &#123;&#125;"</span>, event);    log.error(<span class="hljs-string">"after commit then send event &#123;&#125;"</span>, event.getName());&#125;</code></pre></div><p>  发送的spring事件会在监听到AFTER_COMMIT时执行<br>  参考：<a href="https://blog.csdn.net/little_kelvin/article/details/111330768" target="_blank" rel="noopener">https://blog.csdn.net/little_kelvin/article/details/111330768</a></p></li></ul><h2 id="MQ偶然接收到重复消息"><a href="#MQ偶然接收到重复消息" class="headerlink" title="MQ偶然接收到重复消息"></a>MQ偶然接收到重复消息</h2><p>接收端消费了消息但是没有向broker发送ack或者broker没有接收到ack，导致broker将消息再次入队被其他接收端或同一个接收端消费，造成了重复消费消息</p><p>接收端方法做幂等：<br>新增，则可以在消息做一个唯一主键，重复了则会异常，保证数据库没有脏数据。<br>修改，一般都为幂等，修改多少次一般都是一样的结果。</p><p>如果还是比较困难，则用redis记录每次消费并生成全局唯一键&lt;id,message&gt;，每次消费查询一次redis，存在消费记录则不进行消费（处理）</p><h3 id="熔断与服务降级"><a href="#熔断与服务降级" class="headerlink" title="熔断与服务降级"></a>熔断与服务降级</h3><p>当请求某个服务超时或是响应过慢，并在一定时间内次数达到一定阈值，为了防止调用链路响应过长而引发的服务雪崩，我们将暂时不去请求这个服务， 而是调用降级方法，并下线该服务。期间一般会在过去一定时间后，尝试再次请求该服务，获得响应后才会上线，不然都将是调用降级方法。</p><p>例如Hystrix，它有一个滑动时间窗的概念，在这个滑动的时间窗内（默认20s），错误率达到阈值（默认50%）则将打开熔断器，并经过一段时间之后（默认5s）再次执行一次检测是否应该打开熔断器。<br>熔断器在打开期间，调用此服务将直接返回失败（服务降级），不再远程调用。</p><blockquote><p>ps: 服务雪崩是指由于调用链路当中，下游的服务响应太慢或者超时导致上游服务的请求得不到释放， 逐渐导致连接数达到上限从而又对上游服务造成影响 ，如此往复直到最上游服务难以承受压力（超过最大连接数等）</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>MQ</tag>
+      
+      <tag>Micro Service</tag>
+      
+      <tag>Redis</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Redis笔记01</title>
     <link href="/2021/03/24/redis-note-01/"/>
     <url>/2021/03/24/redis-note-01/</url>
@@ -13,7 +42,7 @@
     
     <categories>
       
-      <category>Redis</category>
+      <category>编程</category>
       
     </categories>
     
@@ -45,7 +74,7 @@
     
     <categories>
       
-      <category>Java</category>
+      <category>编程</category>
       
     </categories>
     
@@ -76,7 +105,7 @@
     
     <categories>
       
-      <category>Java</category>
+      <category>编程</category>
       
     </categories>
     
@@ -140,9 +169,7 @@
     
     <categories>
       
-      <category>Java</category>
-      
-      <category>Reactor</category>
+      <category>编程</category>
       
     </categories>
     
@@ -231,7 +258,7 @@
     
     <categories>
       
-      <category>Nginx</category>
+      <category>编程</category>
       
     </categories>
     
